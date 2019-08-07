@@ -116,7 +116,7 @@ export class LAppModel extends CubismUserModel {
   public _allMotionCount: number; // 动作总数
 
   /**
-   * コンストラクタ
+   * 构造函数
    */
   public constructor() {
     super();
