@@ -6,27 +6,27 @@
 */
 
 // ========================================================
-//  ログ出力関数の設定
+//  设置日志输出功能
 // ========================================================
 
-// ---------- ログ出力レベル 選択項目 定義 ----------
-/// 詳細ログ出力設定
+// ---------- 日志输出级别选择项目定义 ----------
+/// 详细的日志输出设置
 export const CSM_LOG_LEVEL_VERBOSE: number = 0;
-/// デバッグログ出力設定
+/// 调试日志输出设置
 export const CSM_LOG_LEVEL_DEBUG: number = 1;
-/// Infoログ出力設定
+/// 信息日志输出设置
 export const CSM_LOG_LEVEL_INFO: number = 2;
-/// 警告ログ出力設定
+/// 警告日志输出设置
 export const CSM_LOG_LEVEL_WARNING: number = 3;
-/// エラーログ出力設定
+/// 错误日志输出设置
 export const CSM_LOG_LEVEL_ERROR: number = 4;
-/// ログ出力オフ設定
+/// 记录输出关闭设置
 export const CSM_LOG_LEVEL_OFF: number = 5;
 
 /**
-* ログ出力レベル設定。
+* 日志输出级别设置。
 *
-* 強制的にログ出力レベルを変える時に定義を有効にする。
-* CSM_LOG_LEVEL_VERBOSE ～ CSM_LOG_LEVEL_OFF を選択する。
+* 强制更改日志输出级别时启用定义。
+* 要选择 CSM_LOG_LEVEL_VERBOSE ～ CSM_LOG_LEVEL_OFF。
 */
 export const CSM_LOG_LEVEL: number = CSM_LOG_LEVEL_VERBOSE;

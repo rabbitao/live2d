@@ -6,12 +6,12 @@
  */
 
 /**
- * @brief パラメータIDのデフォルト値を保持する定数<br>
- *         デフォルト値の仕様は以下のマニュアルに基づく<br>
+ * @brief 保持参数ID默认值的常量<br>
+ *         默认值规范基于以下手册<br>
  *         http://docs.live2d.com/cubism-editor-manual/standard-parametor-list/
  */
 export namespace Live2DCubismFramework {
-    // パーツID
+    // 部件ID
     export const HitAreaPrefix: string = 'HitArea';
     export const HitAreaHead: string = 'Head';
     export const HitAreaBody: string = 'Body';
@@ -20,7 +20,7 @@ export namespace Live2DCubismFramework {
     export const PartsArmLPrefix: string = 'Parts01ArmL_';
     export const PartsArmRPrefix: string = 'Parts01ArmR_';
 
-    // パラメータID
+    // 参数ID
     export const ParamAngleX: string = 'ParamAngleX';
     export const ParamAngleY: string = 'ParamAngleY';
     export const ParamAngleZ: string = 'ParamAngleZ';
