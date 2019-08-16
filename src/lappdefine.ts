@@ -41,6 +41,7 @@ export namespace LAppDefine {
   export const ModelDir: string[] = [
     'Haru',
     'Hiyori',
+    'momo',
     'Mark',
     'Natori',
   ];
