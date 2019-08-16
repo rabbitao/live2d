@@ -21,7 +21,7 @@ export namespace Live2DCubismFramework {
         /**
          * レンダラが保持する静的なリソースを開放する
          */
-        public static staticRelease: Function;
+        public static staticRelease: () => any;
         /**
          * レンダラのインスタンスを生成して取得する
          *

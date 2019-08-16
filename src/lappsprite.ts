@@ -88,7 +88,7 @@ export class LAppSprite {
   /**
    * 绘制
    * @param programId 着色器程序
-   * @param canvas 
+   * @param canvas
    */
   public render(programId: WebGLProgram): void {
     if (this._texture == null) {

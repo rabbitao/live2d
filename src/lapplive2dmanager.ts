@@ -97,7 +97,6 @@ export class LAppLive2DManager {
   public onDrag(x: number, y: number): void {
     for (let i: number = 0; i < this._models.getSize(); i++) {
       const model: LAppModel = this.getModel(i);
-
       if (model) {
         model.setDragging(x, y);
       }

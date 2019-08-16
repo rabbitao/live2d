@@ -8,10 +8,10 @@
 export namespace Live2DCubismFramework {
     export class CubismString {
         /**
-         * 標準出力の書式を適用した文字列を取得する。
-         * @param format    標準出力の書式指定文字列
-         * @param ...args   書式指定文字列に渡す文字列
-         * @return 書式を適用した文字列
+         * 获取应用了标准输出格式的字符串。
+         * @param format    标准输出格式字符串
+         * @param ...args   要传递给格式字符串的字符串
+         * @return 应用格式的字符串
          */
         public static getFormatedString(format: string, ... args: any[]): string {
             const ret: string = format;
@@ -24,11 +24,11 @@ export namespace Live2DCubismFramework {
         }
 
         /**
-         * textがstartWordで始まっているかどうかを返す
-         * @param test 検査対象の文字列
-         * @param startWord 比較対象の文字列
-         * @return true textがstartWordで始まっている
-         * @return false textがstartWordで始まっていない
+         * 返回文本是否以startWord开头
+         * @param test 要检查的字符串
+         * @param startWord 要比较的字符串
+         * @return true text以startWord开头
+         * @return false text不以startWord开头
          */
         public static isStartWith(text: string, startWord: string): boolean {
             let textIndex = 0;
@@ -44,10 +44,10 @@ export namespace Live2DCubismFramework {
         /**
          * position位置の文字から数字を解析する。
          *
-         * @param string 文字列
-         * @param length 文字列の長さ
-         * @param position 解析したい文字の位置
-         * @param outEndPos 一文字も読み込まなかった場合はエラー値(-1)が入る
+         * @param string 字符串
+         * @param length 字符串长度
+         * @param position 要分析的文字的位置
+         * @param outEndPos 如果未读取任何字符，则输入错误值（-1）。
          * @return 解析結果の数値
          */
         public static stringToFloat(string: string, length: number, position: number, outEndPos: number[]): number {
@@ -105,7 +105,7 @@ export namespace Live2DCubismFramework {
         }
 
         /**
-         * コンストラクタ呼び出し不可な静的クラスにする。
+         * 创建无法调用构造函数的静态类
          */
         private constructor() {
 

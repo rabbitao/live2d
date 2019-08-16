@@ -169,7 +169,7 @@ export class LAppModel extends CubismUserModel {
         // 更新状态
         this._state = LoadStep.LoadModel;
 
-        //保存结果
+        // 保存结果
         this.setupModel(setting);
       },
     );
@@ -250,7 +250,7 @@ export class LAppModel extends CubismUserModel {
 
     // 唇形同步设置
     if (this._lipsync) {
-      const value: number = 0;  //当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
+      const value: number = 0;  // 当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
 
       for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
         this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
