@@ -270,7 +270,7 @@ export class LAppModel extends CubismUserModel {
       //       this._lipsyncTrend = 'increase'
       //     }
       //   }
-        
+
       //   this._lastLipSyncValue = value
       //   this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
       // }

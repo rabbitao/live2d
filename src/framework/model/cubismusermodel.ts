@@ -118,7 +118,7 @@ export namespace Live2DCubismFramework {
       this._opacity = 1.0;
       this._lipsync = true;
       this._lastLipSyncValue = 0.0;
-      this._lipsyncTrend = 'increase'
+      this._lipsyncTrend = 'increase';
       this._dragX = 0.0;
       this._dragY = 0.0;
       this._accelerationX = 0.0;
