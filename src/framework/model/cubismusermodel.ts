@@ -87,6 +87,7 @@ export namespace Live2DCubismFramework {
     protected _opacity: number;     // 不透明度
     protected _lipsync: boolean;    // 是否唇同步
     protected _lastLipSyncValue: number;     // 最后唇同步控制位置
+    protected _lipsyncTrend: string; // 唇形变化趋势
     protected _dragX: number;     // 鼠标拖动X位置
     protected _dragY: number;     // 鼠标拖动Y位置
     protected _accelerationX: number;     // X轴加速度
@@ -117,6 +118,7 @@ export namespace Live2DCubismFramework {
       this._opacity = 1.0;
       this._lipsync = true;
       this._lastLipSyncValue = 0.0;
+      this._lipsyncTrend = 'increase'
       this._dragX = 0.0;
       this._dragY = 0.0;
       this._accelerationX = 0.0;

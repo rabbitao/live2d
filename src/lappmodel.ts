@@ -251,10 +251,29 @@ export class LAppModel extends CubismUserModel {
     // 唇形同步设置
     if (this._lipsync) {
       const value: number = 0;  // 当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
-
       for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
         this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
       }
+      // let value: number = this._lastLipSyncValue;
+      // let trend = this._lipsyncTrend;
+      // for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
+      //   if (trend === 'increase') {
+      //     value = value + 0.05
+      //     if (value >= 1) {
+      //       value = 1
+      //       this._lipsyncTrend = 'reduce'
+      //     }
+      //   } else {
+      //     value = value - 0.05
+      //     if (value <= 0) {
+      //       value = 0
+      //       this._lipsyncTrend = 'increase'
+      //     }
+      //   }
+        
+      //   this._lastLipSyncValue = value
+      //   this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
+      // }
     }
 
     // 姿势设置
@@ -510,7 +529,6 @@ export class LAppModel extends CubismUserModel {
       canvas.width,
       canvas.height,
     ];
-
     this.getRenderer().setRenderState(frameBuffer, viewport);
     this.getRenderer().drawModel();
   }
