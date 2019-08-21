@@ -50,16 +50,14 @@ export class LAppLive2DManager {
 
   public _viewMatrix: Csm_CubismMatrix44;    // 用于模型绘制的视图矩阵
   public _models: Csm_csmVector<LAppModel>;  // 模型实例容器
-  public _sceneIndex: number;                // 要显示的场景的索引值
 
   /**
    * 构造函数
    */
-  constructor() {
+  constructor(resource: {path: string, modelName: ''}) {
     this._viewMatrix = new Csm_CubismMatrix44();
     this._models = new Csm_csmVector<LAppModel>();
-    this._sceneIndex = 0;
-    this.changeScene(this._sceneIndex);
+    this.loadScene(resource);
   }
 
   /**
@@ -158,34 +156,17 @@ export class LAppLive2DManager {
   }
 
   /**
-   * 切换到下一个场景
-   * 在示例应用程序中，切换模型集。
-   */
-  public nextScene(): void {
-    const no: number = (this._sceneIndex + 1) % LAppDefine.ModelDirSize;
-    this.changeScene(no);
-  }
-
-  /**
    * 切换场景
    * 在示例应用程序中，切换模型集。
    */
-  public changeScene(index: number): void {
-    this._sceneIndex = index;
+  public loadScene(resource: { path: string, modelName: '' }): void {
     if (LAppDefine.DebugLogEnable) {
-      LAppPal.printLog('[APP]model index: {0}', this._sceneIndex);
+      LAppPal.printLog('[APP]model', resource.modelName);
     }
-
-    // 从存储在ModelDir []中的目录名称
-    // 确定model3.json的路径。
-    // 确保目录名称与model3.json的名称匹配。
-    const model: string = LAppDefine.ModelDir[index];
-    const modelPath: string = LAppDefine.ResourcesPath + model + '/';
-    let modelJsonName: string = LAppDefine.ModelDir[index];
-    modelJsonName += '.model3.json';
+    resource.modelName += '.model3.json';
 
     this.releaseAllModel();
     this._models.pushBack(new LAppModel());
-    this._models.at(0).loadAssets(modelPath, modelJsonName);
+    this._models.at(0).loadAssets(resource.path, resource.modelName);
   }
 }
