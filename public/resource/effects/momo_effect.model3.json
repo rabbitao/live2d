@@ -1,0 +1,51 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "momo_effect.moc3",
+		"Textures": [
+			"momo_effect.1024/texture_00.png"
+    ],
+    "Motions": {
+      "comeIn": [
+        {
+          "File": "motions/comeIn_effectUp.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "goOut": [
+        {
+          "File": "motions/goOut_effectUp.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "flashec_up": [
+        {
+          "File": "motions/flashec_effectUp.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "flashec_down": [
+        {
+          "File": "motions/flashec_effectDown.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ]
+    }
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	]
+}
