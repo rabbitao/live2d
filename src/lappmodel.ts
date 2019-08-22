@@ -209,7 +209,7 @@ export class LAppModel extends CubismUserModel {
     this._model.loadParameters();   // 加载上次保存的状态
     if (this._motionManager.isFinished()) {
       // 如果没有动作播放，则从待机动作中随机播放
-      this.startRandomMotion(LAppDefine.MotionGroupIdle, LAppDefine.PriorityIdle);
+      this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
 
     } else {
       motionUpdated = this._motionManager.updateMotion(this._model, deltaTimeSeconds);    // 更新动作
@@ -407,6 +407,14 @@ export class LAppModel extends CubismUserModel {
     this._motionManager.stopAllMotions()
   }
 
+  /*
+  * 更改idle动作的名称.
+  */
+  public replaceIdleMotion(groupName: string) {
+    this._motionManager.stopAllMotions()
+    this._motionIdleName = groupName;
+    this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+  }
   /**
    * 设置参数指定的面部表情运动
    *

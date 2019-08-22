@@ -44,6 +44,7 @@ import CubismModelMatrix = cubismmodelmatrix.CubismModelMatrix;
 import CubismTargetPoint = cubismtargetpoint.CubismTargetPoint;
 import CubismMotionManager = cubismmotionmanager.CubismMotionManager;
 import CubismMotionParam = userMotionParam.CubismMotionParam;
+import { LAppDefine } from '@/lappdefine';
 
 export namespace Live2DCubismFramework {
   /**
@@ -75,7 +76,8 @@ export namespace Live2DCubismFramework {
     protected _model: CubismModel;            // 模型实例
 
     protected _motionManager: CubismMotionManager;    // 运动管理
-    protected _motionQueue: Array<CubismMotionParam>;
+    protected _motionQueue: Array<CubismMotionParam>; // 动作队列
+    protected _motionIdleName: string; // 默认发呆的动作名称
     protected _expressionManager: CubismMotionManager;    // 面部表情管理
     protected _eyeBlink: CubismEyeBlink;         // 自动闪烁
     protected _breath: CubismBreath;           // 呼吸
@@ -130,6 +132,7 @@ export namespace Live2DCubismFramework {
       this._debugMode = false;
       this._renderer = null as any;
       this._motionQueue = [];
+      this._motionIdleName = LAppDefine.MotionGroupIdle;
 
       // 创建一个运动管理器
       this._motionManager = new CubismMotionManager();
