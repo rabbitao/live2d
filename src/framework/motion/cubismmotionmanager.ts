@@ -66,7 +66,7 @@ export namespace Live2DCubismFramework {
      * @param priority        优先
      * @return                返回已启动的运动的标识号。 在IsFinished（）的参数中使用，用于确定单个动作是否已结束。 无法启动时“-1”
      */
-    public startMotionPriority(motion: ACubismMotion, autoDelete: boolean, priority: number, model: CubismUserModel): CubismMotionQueueEntryHandle {
+    public startMotionPriority(motion: ACubismMotion, autoDelete: boolean, priority: number, model: CubismUserModel): Promise<CubismUserModel> {
       if (priority == this._reservePriority) {
         this._reservePriority = 0;  // 取消预订
       }

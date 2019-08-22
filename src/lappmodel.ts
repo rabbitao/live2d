@@ -293,7 +293,7 @@ export class LAppModel extends CubismUserModel {
    * @param priority 优先级
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
-  public startMotion(group: string, no: number, priority: number): CubismMotionQueueEntryHandle {
+  public startMotion(group: string, no: number = 0, priority: number = 2): Promise<CubismUserModel> {
     if (priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(priority);
     } else if (!this._motionManager.reserveMotion(priority)) {
@@ -347,7 +347,9 @@ export class LAppModel extends CubismUserModel {
       LAppPal.printLog('[APP]start motion: [{0}_{1}', group, no);
     }
     if (motion == null) {
-      return -1;
+      return new Promise<CubismUserModel>((reslove, reject) => {
+        reject('没有可执行的motion');
+      });
     }
     return this._motionManager.startMotionPriority(motion, autoDelete, priority, this);
   }
@@ -358,7 +360,7 @@ export class LAppModel extends CubismUserModel {
    * @param priority 优先级
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 当你无法开始时返回[-1]
    */
-  public startRandomMotion(group: string, priority: number): CubismMotionQueueEntryHandle {
+  public startRandomMotion(group: string, priority: number): Promise<CubismUserModel> {
     if (this._modelSetting.getMotionCount(group) == 0) {
       return InvalidMotionQueueEntryHandleValue;
     }

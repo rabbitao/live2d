@@ -68,13 +68,12 @@ export namespace Live2DCubismFramework {
      * @param   motion          动作开始
      * @param   autoDelete      如果已完成播放的动画实例已删除，则为True
      * @param   userTimeSeconds 增量时间的综合值[秒]
-     * @return  返回已启动的运动的标识号。 在IsFinished（）的参数中使用，用于确定单个动作是否已结束。 无法启动时“-1”
-     *          返回usermodel对象
+     * @return  返回usermodel对象
      */
-    public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number, model: CubismUserModel): CubismMotionQueueEntryHandle {
-      return new Promise((resolve) => {
+    public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number, model: CubismUserModel): Promise<CubismUserModel> {
+      return new Promise<CubismUserModel>((resolve) => {
         if (motion == null) {
-          return InvalidMotionQueueEntryHandleValue;
+          return model;
         }
 
         let motionQueueEntry: CubismMotionQueueEntry = null as any;
@@ -98,7 +97,7 @@ export namespace Live2DCubismFramework {
         time = setInterval(() => {
           if (this.isFinished()) {
             clearInterval(time as number);
-            time = null
+            time = null;
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
             resolve(model);
           }
