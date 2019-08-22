@@ -29,9 +29,9 @@ export class LAppLive2DManager {
    *
    * @return 一个类的实例
    */
-  public static getInstance(): LAppLive2DManager {
+  public static getInstance(resource: { path: string, modelName: string }): LAppLive2DManager {
     if (s_instance == null) {
-      s_instance = new LAppLive2DManager();
+      s_instance = new LAppLive2DManager(resource);
     }
 
     return s_instance;
@@ -54,7 +54,7 @@ export class LAppLive2DManager {
   /**
    * 构造函数
    */
-  constructor(resource: {path: string, modelName: ''}) {
+  constructor(resource: {path: string, modelName: string}) {
     this._viewMatrix = new Csm_CubismMatrix44();
     this._models = new Csm_csmVector<LAppModel>();
     this.loadScene(resource);
@@ -159,14 +159,18 @@ export class LAppLive2DManager {
    * 切换场景
    * 在示例应用程序中，切换模型集。
    */
-  public loadScene(resource: { path: string, modelName: '' }): void {
+  public loadScene(resource: { path: string, modelName: string }): void {
     if (LAppDefine.DebugLogEnable) {
       LAppPal.printLog('[APP]model', resource.modelName);
     }
     resource.modelName += '.model3.json';
 
     this.releaseAllModel();
-    this._models.pushBack(new LAppModel());
+    this._models.pushBack(new LAppModel(resource));
     this._models.at(0).loadAssets(resource.path, resource.modelName);
+    this._models.at(0).motionEventFired = () => {
+      console.log('event call');
+    };
+    (window as any).model = this._models.at(0);
   }
 }

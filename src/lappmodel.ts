@@ -114,13 +114,15 @@ export class LAppModel extends CubismUserModel {
   public _textureCount: number;   // 纹理计数
   public _motionCount: number;   // 动作数据计数
   public _allMotionCount: number; // 动作总数
+  public _modelResource: { path: string, modelName: string }; // 模型资源
+
 
   /**
    * 构造函数
    */
-  public constructor() {
+  public constructor(resource: { path: string, modelName: string }) {
     super();
-
+    this._modelResource = resource;
     this._modelSetting = null as any;
     this._modelHomeDir = null as any;
     this._userTimeSeconds = 0.0;
@@ -204,6 +206,7 @@ export class LAppModel extends CubismUserModel {
     // --------------------------------------------------------------------------
     this._model.loadParameters();   // 加载上次保存的状态
     if (this._motionManager.isFinished()) {
+      console.warn('finish')
       // 如果没有动作播放，则从待机动作中随机播放
       this.startRandomMotion(LAppDefine.MotionGroupIdle, LAppDefine.PriorityIdle);
 
@@ -343,6 +346,9 @@ export class LAppModel extends CubismUserModel {
 
     if (this._debugMode) {
       LAppPal.printLog('[APP]start motion: [{0}_{1}', group, no);
+    }
+    if (motion == null) {
+      return -1;
     }
     return this._motionManager.startMotionPriority(motion, autoDelete, priority);
   }
@@ -883,7 +889,7 @@ export class LAppModel extends CubismUserModel {
         };
 
         // 阅读
-        LAppDelegate.getInstance().getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
+        LAppDelegate.getInstance(this._modelResource).getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
         this.getRenderer().setIsPremultipliedAlpha(usePremultiply);
       }
 

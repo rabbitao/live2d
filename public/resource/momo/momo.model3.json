@@ -11,16 +11,6 @@
     "Motions": {
       "Idle": [
         {
-          "File": "motions/idel.motion3.json",
-          "FadeInTime": 0.5,
-          "FadeOutTime": 0.5
-        },
-        {
-          "File": "motions/standby1.motion3.json",
-          "FadeInTime": 0.5,
-          "FadeOutTime": 0.5
-        },
-        {
           "File": "motions/thinking.motion3.json",
           "FadeInTime": 0.5,
           "FadeOutTime": 0.5
@@ -29,6 +19,56 @@
       "TapBody": [
         {
           "File": "motions/listen.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "listen": [
+        {
+          "File": "motions/listen.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "excite": [
+        {
+          "File": "motions/excite.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "sleep": [
+        {
+          "File": "motions/sleep.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "run": [
+        {
+          "File": "motions/run.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "queue": [
+        {
+          "File": "motions/sleep.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/listen.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/wakeUp.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        },
+        {
+          "File": "motions/run.motion3.json",
           "FadeInTime": 0.5,
           "FadeOutTime": 0.5
         }

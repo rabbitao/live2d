@@ -128,7 +128,6 @@ export namespace Live2DCubismFramework {
           ite.preIncrement();
         }
       }
-
       return true;
     }
 
@@ -224,7 +223,6 @@ export namespace Live2DCubismFramework {
      */
     public doUpdateMotion(model: CubismModel, userTimeSeconds: number): boolean {
       let updated: boolean = false;
-
       // ------- 执行的过程 --------
       // 如果已经有动作，则提高结束标志
 

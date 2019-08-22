@@ -31,9 +31,9 @@ export class LAppDelegate {
    *
    * @return 一个类的实例
    */
-  public static getInstance(): LAppDelegate {
+  public static getInstance(resource: { path: string, modelName: string }): LAppDelegate {
     if (s_instance == null) {
-      s_instance = new LAppDelegate();
+      s_instance = new LAppDelegate(resource);
     }
 
     return s_instance;
@@ -57,18 +57,20 @@ export class LAppDelegate {
   public _mouseY: number;                    // 鼠标Y坐标
   public _isEnd: boolean;                    // APP终止了吗
   public _textureManager: LAppTextureManager; // 纹理管理
+  public _modelResource: { path: string, modelName: string }; // 模型资源
 
   /**
    * 构造函数
    */
-  constructor() {
+  constructor(resource: { path: string, modelName: string }) {
     this._captured = false;
     this._mouseX = 0.0;
     this._mouseY = 0.0;
     this._isEnd = false;
+    this._modelResource = resource;
 
     this._cubismOption = new Csm_Option();
-    this._view = new LAppView();
+    this._view = new LAppView(resource);
     this._textureManager = new LAppTextureManager();
   }
 
@@ -102,15 +104,122 @@ export class LAppDelegate {
 
     if (supportTouch) {
       // 与触摸相关的回调函数注册
-      canvas.ontouchstart = onTouchBegan;
-      canvas.ontouchmove = onTouchMoved;
-      canvas.ontouchend = onTouchEnded;
-      canvas.ontouchcancel = onTouchCancel;
+      /**
+      * 触摸时调用。
+      */
+      canvas.ontouchstart = (e: TouchEvent) => {
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+
+        this._captured = true;
+
+        const posX = e.changedTouches[0].pageX;
+        const posY = e.changedTouches[0].pageY;
+
+        this._view.onTouchesBegan(posX, posY);
+      };
+      /*
+      * 触摸移动时调用。
+      */
+      canvas.ontouchmove = (e: TouchEvent) => {
+        if (!this._captured) {
+          return;
+        }
+
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+
+        const rect = (e.target as Element).getBoundingClientRect();
+
+        const posX = e.changedTouches[0].clientX - rect.left;
+        const posY = e.changedTouches[0].clientY - rect.top;
+
+        this._view.onTouchesMoved(posX, posY);
+      };
+    /*
+    * 触摸完成时调用。
+    */
+      canvas.ontouchend = (e: TouchEvent) => {
+        this._captured = false;
+
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+
+        const rect = (e.target as Element).getBoundingClientRect();
+
+        const posX = e.changedTouches[0].clientX - rect.left;
+        const posY = e.changedTouches[0].clientY - rect.top;
+
+        this._view.onTouchesEnded(posX, posY);
+      };
+    /*
+  * 取消触摸。
+  */
+      canvas.ontouchcancel = (e: TouchEvent) => {
+        this._captured = false;
+
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+
+        const rect = (e.target as Element).getBoundingClientRect();
+
+        const posX = e.changedTouches[0].clientX - rect.left;
+        const posY = e.changedTouches[0].clientY - rect.top;
+
+        this._view.onTouchesEnded(posX, posY);
+      };
     } else {
       // 注册鼠标相关的回调函数
-      canvas.onmousedown = onClickBegan;
-      canvas.onmousemove = onMouseMoved;
-      canvas.onmouseup = onClickEnded;
+      canvas.onmousedown = (e: MouseEvent) => {
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+        this._captured = true;
+
+        const posX: number = e.pageX;
+        const posY: number = e.pageY;
+
+        this._view.onTouchesBegan(posX, posY);
+      };
+      canvas.onmousemove = (e: MouseEvent) => {
+        if (!this._captured) {
+          return;
+        }
+
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+
+        const rect = (e.target as Element).getBoundingClientRect();
+        const posX: number = e.clientX - rect.left;
+        const posY: number = e.clientY - rect.top;
+
+        this._view.onTouchesMoved(posX, posY);
+      };
+      canvas.onmouseup = (e: MouseEvent) => {
+        this._captured = false;
+        if (!this._view) {
+          LAppPal.printLog('view notfound');
+          return;
+        }
+
+
+        const rect = (e.target as Element).getBoundingClientRect();
+        const posX: number = e.clientX - rect.left;
+        const posY: number = e.clientY - rect.top;
+
+        this._view.onTouchesEnded(posX, posY);
+      };
     }
 
     // AppView初始化
@@ -154,7 +263,7 @@ export class LAppDelegate {
       LAppPal.updateTime();
 
       // 屏幕初始化
-      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clearColor(1, 1, 1, 0);
 
       // 启用深度测试
       gl.enable(gl.DEPTH_TEST);
@@ -266,7 +375,7 @@ export class LAppDelegate {
     Csm_CubismFramework.initialize();
 
     // load model
-    LAppLive2DManager.getInstance();
+    LAppLive2DManager.getInstance(this._modelResource);
 
     // default proj
     const projection: Csm_CubismMatrix44 = new Csm_CubismMatrix44();
@@ -275,135 +384,4 @@ export class LAppDelegate {
 
     this._view.initializeSprite();
   }
-}
-
-/**
- * 点击时调用。
- */
-function onClickBegan(e: MouseEvent): void {
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-  LAppDelegate.getInstance()._captured = true;
-
-  const posX: number = e.pageX;
-  const posY: number = e.pageY;
-
-  LAppDelegate.getInstance()._view.onTouchesBegan(posX, posY);
-}
-
-/**
- * 鼠标指针移动时调用。
- */
-function onMouseMoved(e: MouseEvent): void {
-  if (!LAppDelegate.getInstance()._captured) {
-    return;
-  }
-
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-
-  const rect = (e.target as Element).getBoundingClientRect();
-  const posX: number = e.clientX - rect.left;
-  const posY: number = e.clientY - rect.top;
-
-  LAppDelegate.getInstance()._view.onTouchesMoved(posX, posY);
-}
-
-/**
- * 点击完成后调用。
- */
-function onClickEnded(e: MouseEvent): void {
-  LAppDelegate.getInstance()._captured = false;
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-
-
-  const rect = (e.target as Element).getBoundingClientRect();
-  const posX: number = e.clientX - rect.left;
-  const posY: number = e.clientY - rect.top;
-
-  LAppDelegate.getInstance()._view.onTouchesEnded(posX, posY);
-}
-
-
-/**
- * 触摸时调用。
- */
-function onTouchBegan(e: TouchEvent): void {
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-
-  LAppDelegate.getInstance()._captured = true;
-
-  const posX = e.changedTouches[0].pageX;
-  const posY = e.changedTouches[0].pageY;
-
-  LAppDelegate.getInstance()._view.onTouchesBegan(posX, posY);
-}
-
-/**
- * 叫刷卡。
- */
-function onTouchMoved(e: TouchEvent): void {
-  if (!LAppDelegate.getInstance()._captured) {
-    return;
-  }
-
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-
-  const rect = (e.target as Element).getBoundingClientRect();
-
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
-
-  LAppDelegate.getInstance()._view.onTouchesMoved(posX, posY);
-}
-
-/**
- * 触摸完成时调用。
- */
-function onTouchEnded(e: TouchEvent): void {
-  LAppDelegate.getInstance()._captured = false;
-
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-
-  const rect = (e.target as Element).getBoundingClientRect();
-
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
-
-  LAppDelegate.getInstance()._view.onTouchesEnded(posX, posY);
-}
-
-/**
- * 取消触摸。
- */
-function onTouchCancel(e: TouchEvent): void {
-  LAppDelegate.getInstance()._captured = false;
-
-  if (!LAppDelegate.getInstance()._view) {
-    LAppPal.printLog('view notfound');
-    return;
-  }
-
-  const rect = (e.target as Element).getBoundingClientRect();
-
-  const posX = e.changedTouches[0].clientX - rect.left;
-  const posY = e.changedTouches[0].clientY - rect.top;
-
-  LAppDelegate.getInstance()._view.onTouchesEnded(posX, posY);
 }

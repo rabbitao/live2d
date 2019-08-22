@@ -30,13 +30,15 @@ export class LAppView {
   public _gear: LAppSprite;                      // 齿轮图像
   public _changeModel: boolean = false;                  // 模型切换标志
   public _isClick: boolean = false;                      // 点击
+  public _modelResource: { path: string, modelName: string }; // 模型资源
   /**
    * 构造函数
    */
-  constructor() {
+  constructor(resource: { path: string, modelName: string }) {
     this._programId = null as any;
     this._back = null as any;
     this._gear = null as any;
+    this._modelResource = resource;
 
     // 与触摸相关的事件管理
     this._touchManager = new TouchManager();
@@ -104,17 +106,18 @@ export class LAppView {
    */
   public render(): void {
     gl.useProgram(this._programId);
-
-    if (this._back) {
-      this._back.render(this._programId);
-    }
-    if (this._gear) {
-      this._gear.render(this._programId);
-    }
+    // 背景图像
+    // if (this._back) {
+    //   this._back.render(this._programId);
+    // }
+    // 齿轮
+    // if (this._gear) {
+    //   this._gear.render(this._programId);
+    // }
 
     gl.flush();
 
-    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
+    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance(this._modelResource);
 
     live2DManager.onUpdate();
   }
@@ -126,41 +129,41 @@ export class LAppView {
     const width: number = canvas.width;
     const height: number = canvas.height;
 
-    const textureManager = LAppDelegate.getInstance().getTextureManager();
+    const textureManager = LAppDelegate.getInstance(this._modelResource).getTextureManager();
     const resourcesPath = LAppDefine.ResourcesPath;
 
     let imageName: string = '';
 
     // 背景图像初始化
-    imageName = LAppDefine.BackImageName;
+    // imageName = LAppDefine.BackImageName;
 
-    // 创建一个回调函数，因为它是异步的
-    const initBackGroundTexture = (textureInfo: TextureInfo): void => {
-      const x: number = width * 0.5;
-      const y: number = height * 0.5;
+    // // 创建一个回调函数，因为它是异步的
+    // const initBackGroundTexture = (textureInfo: TextureInfo): void => {
+    //   const x: number = width * 0.5;
+    //   const y: number = height * 0.5;
 
-      const fwidth = textureInfo.width * 2.0;
-      const fheight = height * 0.95;
-      this._back = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
-    };
+    //   const fwidth = textureInfo.width * 2.0;
+    //   const fheight = height * 0.95;
+    //   this._back = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
+    // };
 
-    textureManager.createTextureFromPngFile(resourcesPath + imageName, false, initBackGroundTexture);
+    // textureManager.createTextureFromPngFile(resourcesPath + imageName, false, initBackGroundTexture);
 
-    // 齿轮图像初始化
-    imageName = LAppDefine.GearImageName;
-    const initGearTexture = (textureInfo: TextureInfo): void => {
-      const x = width - textureInfo.width * 0.5;
-      const y = height - textureInfo.height * 0.5;
-      const fwidth = textureInfo.width;
-      const fheight = textureInfo.height;
-      this._gear = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
-    };
+    // // 齿轮图像初始化
+    // imageName = LAppDefine.GearImageName;
+    // const initGearTexture = (textureInfo: TextureInfo): void => {
+    //   const x = width - textureInfo.width * 0.5;
+    //   const y = height - textureInfo.height * 0.5;
+    //   const fwidth = textureInfo.width;
+    //   const fheight = textureInfo.height;
+    //   this._gear = new LAppSprite(x, y, fwidth, fheight, textureInfo.id);
+    // };
 
-    textureManager.createTextureFromPngFile(resourcesPath + imageName, false, initGearTexture);
+    // textureManager.createTextureFromPngFile(resourcesPath + imageName, false, initGearTexture);
 
     // 创建着色器
     if (this._programId == null) {
-      this._programId = LAppDelegate.getInstance().createShader();
+      this._programId = LAppDelegate.getInstance(this._modelResource).createShader();
     }
   }
 
@@ -186,7 +189,7 @@ export class LAppView {
 
     this._touchManager.touchesMoved(pointX, pointY);
 
-    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
+    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance(this._modelResource);
     live2DManager.onDrag(viewX, viewY);
   }
 
@@ -198,7 +201,7 @@ export class LAppView {
    */
   public onTouchesEnded(pointX: number, pointY: number): void {
     // 触摸结束
-    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
+    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance(this._modelResource);
     live2DManager.onDrag(0.0, 0.0);
 
     {
@@ -212,8 +215,9 @@ export class LAppView {
       live2DManager.onTap(x, y);
 
       // 敲击齿轮
-      if (this._gear.isHit(pointX, pointY)) {
-        live2DManager.nextScene();
+      if (this._gear && this._gear.isHit(pointX, pointY)) {
+        LAppPal.printLog('[APP]click gear x: {0} y: {1}', pointX, pointY);
+        // live2DManager.nextScene();
       }
     }
   }

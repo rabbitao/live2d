@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <canvas id="SAMPLE" width="1900" height="1000">
+    <canvas id="SAMPLE" width="1400" height="800">
         このブラウザは
         <code>&lt;canvas&lt;</code>要素をサポートしていません。
     </canvas>
@@ -14,11 +14,12 @@ import { LAppDelegate } from './lappdelegate';
 @Component
 export default class App extends Vue {
   public mounted() {
-    if (LAppDelegate.getInstance().initialize() == false) {
+    let lappdelegate = LAppDelegate.getInstance({path: '/resource/momo/', modelName: 'momo'});
+    if (lappdelegate.initialize() == false) {
       return;
     }
 
-    LAppDelegate.getInstance().run();
+    lappdelegate.run();
   }
   public beforeDestroy() {
     LAppDelegate.releaseInstance();
