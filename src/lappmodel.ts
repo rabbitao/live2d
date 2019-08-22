@@ -22,6 +22,7 @@ import { Live2DCubismFramework as cubismmotion } from './framework/motion/cubism
 import { Live2DCubismFramework as cubismmotionqueuemanager } from './framework/motion/cubismmotionqueuemanager';
 import { Live2DCubismFramework as csmstring } from './framework/type/csmstring';
 import { Live2DCubismFramework as csmrect } from './framework/type/csmrectf';
+import { Live2DCubismFramework as userMotionParam } from './framework/type/userMotionParam';
 import { CubismLogInfo } from './framework/utils/cubismdebug';
 import csmRect = csmrect.csmRect;
 import csmString = csmstring.csmString;
@@ -42,6 +43,7 @@ import CubismUserModel = cubismusermodel.CubismUserModel;
 import ICubismModelSetting = icubismmodelsetting.ICubismModelSetting;
 import CubismModelSettingJson = cubismmodelsettingjson.CubismModelSettingJson;
 import CubismDefaultParameterId = cubismdefaultparameterid;
+import CubismMotionParam = userMotionParam.CubismMotionParam;
 
 import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
@@ -293,20 +295,22 @@ export class LAppModel extends CubismUserModel {
    * @param priority 优先级
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
-  public startMotion(group: string, no: number = 0, priority: number = 2): Promise<CubismUserModel> {
-    if (priority == LAppDefine.PriorityForce) {
-      this._motionManager.setReservePriority(priority);
-    } else if (!this._motionManager.reserveMotion(priority)) {
+  public startMotion(motionParams: CubismMotionParam = {groupName: '', no: 0, priority: 2}): Promise<CubismUserModel> {
+    motionParams.no = motionParams.no || 0;
+    motionParams.priority = motionParams.priority || 2;
+    if (motionParams.priority == LAppDefine.PriorityForce) {
+      this._motionManager.setReservePriority(motionParams.priority);
+    } else if (!this._motionManager.reserveMotion(motionParams.priority)) {
       if (this._debugMode) {
         LAppPal.printLog('[APP]can\'t start motion.');
       }
       return InvalidMotionQueueEntryHandleValue;
     }
 
-    const fileName: string = this._modelSetting.getMotionFileName(group, no);
+    const fileName: string = this._modelSetting.getMotionFileName(motionParams.groupName, motionParams.no);
 
     // ex) idle_0
-    const name: string = CubismString.getFormatedString('{0}_{1}', group, no);
+    const name: string = CubismString.getFormatedString('{0}_{1}', motionParams.groupName, motionParams.no);
     let motion: CubismMotion = this._motions.getValue(name) as CubismMotion;
     let autoDelete: boolean = false;
 
@@ -324,13 +328,13 @@ export class LAppModel extends CubismUserModel {
           const size = buffer.byteLength;
 
           motion = this.loadMotion(buffer, size, null as any) as CubismMotion;
-          let fadeTime: number = this._modelSetting.getMotionFadeInTimeValue(group, no);
+          let fadeTime: number = this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
 
           if (fadeTime >= 0.0) {
             motion.setFadeInTime(fadeTime);
           }
 
-          fadeTime = this._modelSetting.getMotionFadeOutTimeValue(group, no);
+          fadeTime = this._modelSetting.getMotionFadeOutTimeValue(motionParams.groupName, motionParams.no);
           if (fadeTime >= 0.0) {
             motion.setFadeOutTime(fadeTime);
           }
@@ -344,14 +348,14 @@ export class LAppModel extends CubismUserModel {
     }
 
     if (this._debugMode) {
-      LAppPal.printLog('[APP]start motion: [{0}_{1}', group, no);
+      LAppPal.printLog('[APP]start motion: [{0}_{1}', motionParams.groupName, motionParams.no);
     }
     if (motion == null) {
       return new Promise<CubismUserModel>((reslove, reject) => {
         reject('没有可执行的motion');
       });
     }
-    return this._motionManager.startMotionPriority(motion, autoDelete, priority, this);
+    return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
   }
 
   /**
@@ -367,7 +371,40 @@ export class LAppModel extends CubismUserModel {
 
     const no: number = Math.floor(Math.random() * this._modelSetting.getMotionCount(group));
 
-    return this.startMotion(group, no, priority);
+    return this.startMotion({groupName: group, no: no, priority: priority});
+  }
+
+  /**
+   * 执行一组动作。
+   */
+  public startMotionQueue(motions: Array<CubismMotionParam>, clear: boolean = false) {
+    if (clear) {
+      this._motionQueue = []
+      this._motionQueue = motions
+    } else {
+      this._motionQueue = this._motionQueue.concat(motions)
+    }
+    this.executeMotionQueue();
+  }
+  /**
+   * 执行一组动作。
+   */
+  private executeMotionQueue() {
+    if (this._motionQueue.length <= 0) {
+      return
+    }
+    let motionParam = this._motionQueue.shift();
+    this.startMotion(motionParam).then(() => {
+      this.executeMotionQueue();
+    })
+  }
+
+  /*
+   * 停止所有动作 清除动作队列 已执行的动作如果有回调函数依旧会执行.
+   */
+  public stopAllMotions() {
+    this._motionQueue = []
+    this._motionManager.stopAllMotions()
   }
 
   /**

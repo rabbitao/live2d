@@ -70,7 +70,7 @@ export namespace Live2DCubismFramework {
      * @param   userTimeSeconds 增量时间的综合值[秒]
      * @return  返回usermodel对象
      */
-    public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number, model: CubismUserModel): Promise<CubismUserModel> {
+    public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number, model: CubismUserModel, callback?: () => void): Promise<CubismUserModel> {
       return new Promise<CubismUserModel>((resolve) => {
         if (motion == null) {
           return model;
@@ -98,6 +98,9 @@ export namespace Live2DCubismFramework {
           if (this.isFinished()) {
             clearInterval(time as number);
             time = null;
+            if (Object.prototype.toString.call(callback) === '[object Function]') {
+              (callback as Function)()
+            }
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
             resolve(model);
           }

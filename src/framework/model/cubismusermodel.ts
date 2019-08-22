@@ -19,6 +19,7 @@ import { Live2DCubismFramework as cubismmodeluserdata } from './cubismmodeluserd
 import { Live2DCubismFramework as cubismphysics } from '../physics/cubismphysics';
 import { Live2DCubismFramework as cubismid } from '../id/cubismid';
 import { Live2DCubismFramework as csmstring } from '../type/csmstring';
+import { Live2DCubismFramework as userMotionParam } from '../type/userMotionParam';
 import { Live2DCubismFramework as cubismmotionqueuemanager } from '../motion/cubismmotionqueuemanager';
 import { Live2DCubismFramework as cubismbreath } from '../effect/cubismbreath';
 import { Live2DCubismFramework as cubismeyeblink } from '../effect/cubismeyeblink';
@@ -42,6 +43,7 @@ import CubismMoc = cubismmoc.CubismMoc;
 import CubismModelMatrix = cubismmodelmatrix.CubismModelMatrix;
 import CubismTargetPoint = cubismtargetpoint.CubismTargetPoint;
 import CubismMotionManager = cubismmotionmanager.CubismMotionManager;
+import CubismMotionParam = userMotionParam.CubismMotionParam;
 
 export namespace Live2DCubismFramework {
   /**
@@ -73,6 +75,7 @@ export namespace Live2DCubismFramework {
     protected _model: CubismModel;            // 模型实例
 
     protected _motionManager: CubismMotionManager;    // 运动管理
+    protected _motionQueue: Array<CubismMotionParam>;
     protected _expressionManager: CubismMotionManager;    // 面部表情管理
     protected _eyeBlink: CubismEyeBlink;         // 自动闪烁
     protected _breath: CubismBreath;           // 呼吸
@@ -126,6 +129,7 @@ export namespace Live2DCubismFramework {
       this._accelerationZ = 0.0;
       this._debugMode = false;
       this._renderer = null as any;
+      this._motionQueue = [];
 
       // 创建一个运动管理器
       this._motionManager = new CubismMotionManager();
