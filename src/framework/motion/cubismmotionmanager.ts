@@ -8,8 +8,10 @@
 import { Live2DCubismFramework as cubismmotionqueuemanager } from './cubismmotionqueuemanager';
 import { Live2DCubismFramework as acubismmotion } from './acubismmotion';
 import { Live2DCubismFramework as cubismmodel } from '../model/cubismmodel';
+import { Live2DCubismFramework as cubismusermodel } from '../../framework/model/cubismusermodel';
 import CubismMotionQueueEntryHandle = cubismmotionqueuemanager.CubismMotionQueueEntryHandle;
 import CubismModel = cubismmodel.CubismModel;
+import CubismUserModel = cubismusermodel.CubismUserModel;
 import ACubismMotion = acubismmotion.ACubismMotion;
 import CubismMotionQueueManager = cubismmotionqueuemanager.CubismMotionQueueManager;
 
@@ -64,14 +66,14 @@ export namespace Live2DCubismFramework {
      * @param priority        优先
      * @return                返回已启动的运动的标识号。 在IsFinished（）的参数中使用，用于确定单个动作是否已结束。 无法启动时“-1”
      */
-    public startMotionPriority(motion: ACubismMotion, autoDelete: boolean, priority: number): CubismMotionQueueEntryHandle {
+    public startMotionPriority(motion: ACubismMotion, autoDelete: boolean, priority: number, model: CubismUserModel): CubismMotionQueueEntryHandle {
       if (priority == this._reservePriority) {
         this._reservePriority = 0;  // 取消预订
       }
 
       this._currentPriority = priority;   // 设置播放时的动作优先级
 
-      return super.startMotion(motion, autoDelete, this._userTimeSeconds);
+      return super.startMotion(motion, autoDelete, this._userTimeSeconds, model);
     }
 
     public stopAllMotions() {

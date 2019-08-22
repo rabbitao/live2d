@@ -206,7 +206,6 @@ export class LAppModel extends CubismUserModel {
     // --------------------------------------------------------------------------
     this._model.loadParameters();   // 加载上次保存的状态
     if (this._motionManager.isFinished()) {
-      console.warn('finish')
       // 如果没有动作播放，则从待机动作中随机播放
       this.startRandomMotion(LAppDefine.MotionGroupIdle, LAppDefine.PriorityIdle);
 
@@ -350,7 +349,7 @@ export class LAppModel extends CubismUserModel {
     if (motion == null) {
       return -1;
     }
-    return this._motionManager.startMotionPriority(motion, autoDelete, priority);
+    return this._motionManager.startMotionPriority(motion, autoDelete, priority, this);
   }
 
   /**
@@ -382,7 +381,7 @@ export class LAppModel extends CubismUserModel {
     }
 
     if (motion != null) {
-      this._expressionManager.startMotionPriority(motion, false, LAppDefine.PriorityForce);
+      this._expressionManager.startMotionPriority(motion, false, LAppDefine.PriorityForce, this);
     } else {
       if (this._debugMode) {
         LAppPal.printLog('[APP]expression[{0}] is null', expressionId);

@@ -161,7 +161,7 @@ export class LAppLive2DManager {
    */
   public loadScene(resource: { path: string, modelName: string }): void {
     if (LAppDefine.DebugLogEnable) {
-      LAppPal.printLog('[APP]model', resource.modelName);
+      LAppPal.printLog('[APP]model {0}', resource.modelName);
     }
     resource.modelName += '.model3.json';
 

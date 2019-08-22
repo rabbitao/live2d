@@ -10,8 +10,10 @@ import { Live2DCubismFramework as cubismmotionqueueentry } from './cubismmotionq
 import { Live2DCubismFramework as csmvector } from '../type/csmvector';
 import { Live2DCubismFramework as cubismmodel } from '../model/cubismmodel';
 import { Live2DCubismFramework as csmstring } from '../type/csmstring';
+import { Live2DCubismFramework as cubismusermodel } from '../../framework/model/cubismusermodel';
 import csmString = csmstring.csmString;
 import CubismModel = cubismmodel.CubismModel;
+import CubismUserModel = cubismusermodel.CubismUserModel;
 import csmVector = csmvector.csmVector;
 import iterator = csmvector.iterator;
 import CubismMotionQueueEntry = cubismmotionqueueentry.CubismMotionQueueEntry;
@@ -66,32 +68,42 @@ export namespace Live2DCubismFramework {
      * @param   motion          动作开始
      * @param   autoDelete      如果已完成播放的动画实例已删除，则为True
      * @param   userTimeSeconds 增量时间的综合值[秒]
-     * @return                  返回已启动的运动的标识号。 在IsFinished（）的参数中使用，用于确定单个动作是否已结束。 无法启动时“-1”
+     * @return  返回已启动的运动的标识号。 在IsFinished（）的参数中使用，用于确定单个动作是否已结束。 无法启动时“-1”
+     *          返回usermodel对象
      */
-    public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number): CubismMotionQueueEntryHandle {
-      if (motion == null) {
-        return InvalidMotionQueueEntryHandleValue;
-      }
-
-      let motionQueueEntry: CubismMotionQueueEntry = null as any;
-
-      // 如果已经有动作，则提高结束标志
-      for (let i: number = 0; i < this._motions.getSize(); ++i) {
-        motionQueueEntry = this._motions.at(i);
-        if (motionQueueEntry == null) {
-          continue;
+    public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number, model: CubismUserModel): CubismMotionQueueEntryHandle {
+      return new Promise((resolve) => {
+        if (motion == null) {
+          return InvalidMotionQueueEntryHandleValue;
         }
 
-        motionQueueEntry.startFadeout(motionQueueEntry._motion.getFadeOutTime(), userTimeSeconds); // 开始和结束淡出
-      }
+        let motionQueueEntry: CubismMotionQueueEntry = null as any;
 
-      motionQueueEntry = new CubismMotionQueueEntry();　// 完成后丢弃
-      motionQueueEntry._autoDelete = autoDelete;
-      motionQueueEntry._motion = motion;
+        // 如果已经有动作，则提高结束标志
+        for (let i: number = 0; i < this._motions.getSize(); ++i) {
+          motionQueueEntry = this._motions.at(i);
+          if (motionQueueEntry == null) {
+            continue;
+          }
 
-      this._motions.pushBack(motionQueueEntry);
+          motionQueueEntry.startFadeout(motionQueueEntry._motion.getFadeOutTime(), userTimeSeconds); // 开始和结束淡出
+        }
 
-      return motionQueueEntry._motionQueueEntryHandle;
+        motionQueueEntry = new CubismMotionQueueEntry();　// 完成后丢弃
+        motionQueueEntry._autoDelete = autoDelete;
+        motionQueueEntry._motion = motion;
+
+        this._motions.pushBack(motionQueueEntry);
+        let time: number | null = 0;
+        time = setInterval(() => {
+          if (this.isFinished()) {
+            clearInterval(time as number);
+            time = null
+            // resolve(motionQueueEntry._motionQueueEntryHandle, model);
+            resolve(model);
+          }
+        }, 20);
+      });
     }
 
     /**
@@ -141,7 +153,6 @@ export namespace Live2DCubismFramework {
       // 如果已经有动作，则提高结束标志
       for (const ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end()); ite.increment()) {
         const motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
-
         if (motionQueueEntry == null) {
           continue;
         }
