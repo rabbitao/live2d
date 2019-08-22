@@ -74,6 +74,12 @@ export namespace Live2DCubismFramework {
       return super.startMotion(motion, autoDelete, this._userTimeSeconds);
     }
 
+    public stopAllMotions() {
+      this._reservePriority = 0;
+      this._currentPriority = 0;
+      super.stopAllMotions();
+    }
+
     /**
      * 更新运动以反映模型中的参数值。
      *
