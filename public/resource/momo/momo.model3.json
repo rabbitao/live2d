@@ -16,6 +16,13 @@
           "FadeOutTime": 0.5
         }
       ],
+      "comeIn": [
+        {
+          "File": "motions/comeIn.motion3.json",
+          "FadeInTime": 0,
+          "FadeOutTime": 0.5
+        }
+      ],
       "TapBody": [
         {
           "File": "motions/listen.motion3.json",

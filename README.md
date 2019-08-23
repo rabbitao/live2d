@@ -50,6 +50,30 @@ void replaceIdleMotion(groupName: string)
  */
 void clear()
 ```
+
+``` javascript
+/** 
+ *  张嘴
+ */
+void mouthOpen()
+```
+
+``` javascript
+/** 
+ *  闭嘴
+ */
+void mouthClose()
+```
+
+``` javascript
+/** 使模型的眼睛注视某个坐标点
+ *  @Param pointX x坐标
+ *  @Param pointY y坐标
+ *  注: 坐标是以模型原点为(0,0)点, 进行象限分布
+ *  例: 看向左下(第四象限) 坐标可为(-500, -500)
+ */
+void lookAt(pointX: number, pointY: number)
+```
   
 ## Project setup
 ```
@@ -58,22 +82,17 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+yarn dev
 ```
 
 ### Compiles and minifies for production
 ```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
+yarn build
 ```
 
 ### Lints and fixes files
 ```
-yarn run lint
+yarn lint
 ```
 
 ### Customize configuration

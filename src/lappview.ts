@@ -184,9 +184,7 @@ export class LAppView {
   public onTouchesMoved(pointX: number, pointY: number): void {
     const viewX: number = this.transformViewX(this._touchManager.getX());
     const viewY: number = this.transformViewY(this._touchManager.getY());
-
     this._touchManager.touchesMoved(pointX, pointY);
-
     const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
     live2DManager.onDrag(viewX, viewY);
   }

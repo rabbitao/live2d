@@ -185,7 +185,6 @@ export class LAppDelegate {
 
         const posX: number = e.pageX;
         const posY: number = e.pageY;
-
         this._view.onTouchesBegan(posX, posY);
       };
       canvas.onmousemove = (e: MouseEvent) => {
@@ -201,7 +200,6 @@ export class LAppDelegate {
         const rect = (e.target as Element).getBoundingClientRect();
         const posX: number = e.clientX - rect.left;
         const posY: number = e.clientY - rect.top;
-
         this._view.onTouchesMoved(posX, posY);
       };
       canvas.onmouseup = (e: MouseEvent) => {

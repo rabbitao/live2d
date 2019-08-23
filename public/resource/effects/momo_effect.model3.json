@@ -9,8 +9,8 @@
       "comeIn": [
         {
           "File": "motions/comeIn_effectUp.motion3.json",
-          "FadeInTime": 0.5,
-          "FadeOutTime": 0.5
+          "FadeInTime": 0,
+          "FadeOutTime": 0
         }
       ],
       "goOut": [

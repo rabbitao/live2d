@@ -49,6 +49,7 @@ import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
 import { gl, canvas, frameBuffer, LAppDelegate } from './lappdelegate';
 import { TextureInfo } from './lapptexturemanager';
+import { LAppView } from './lappview';
 import 'whatwg-fetch';
 
 function createBuffer(path: string, callBack: any): void {
@@ -117,6 +118,7 @@ export class LAppModel extends CubismUserModel {
   public _motionCount: number;   // 动作数据计数
   public _allMotionCount: number; // 动作总数
   public _modelResource: { path: string, modelName: string }; // 模型资源
+  public _mouseOpen: boolean; // 是否张嘴
 
 
   /**
@@ -150,6 +152,7 @@ export class LAppModel extends CubismUserModel {
     this._textureCount = 0;
     this._motionCount = 0;
     this._allMotionCount = 0;
+    this._mouseOpen = false;
   }
   /**
    * model3.json从目录和文件路径生成模型
@@ -259,31 +262,31 @@ export class LAppModel extends CubismUserModel {
     }
 
     // 唇形同步设置
-    if (this._lipsync) {
-      const value: number = 0;  // 当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
-      for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
-        this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
-      }
-      // let value: number = this._lastLipSyncValue;
-      // let trend = this._lipsyncTrend;
+    if (this._lipsync && this._mouseOpen) {
+      // const value: number = 0;  // 当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
       // for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
-      //   if (trend === 'increase') {
-      //     value = value + 0.05
-      //     if (value >= 1) {
-      //       value = 1
-      //       this._lipsyncTrend = 'reduce'
-      //     }
-      //   } else {
-      //     value = value - 0.05
-      //     if (value <= 0) {
-      //       value = 0
-      //       this._lipsyncTrend = 'increase'
-      //     }
-      //   }
-
-      //   this._lastLipSyncValue = value
-      //   this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
+      //   this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
       // }
+      let value: number = this._lastLipSyncValue;
+      let trend = this._lipsyncTrend;
+      for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
+        if (trend === 'increase') {
+          value = value + 0.05;
+          if (value >= 1) {
+            value = 1;
+            this._lipsyncTrend = 'reduce';
+          }
+        } else {
+          value = value - 0.05;
+          if (value <= 0) {
+            value = 0;
+            this._lipsyncTrend = 'increase';
+          }
+        }
+
+        this._lastLipSyncValue = value;
+        this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
+      }
     }
 
     // 姿势设置
@@ -416,7 +419,7 @@ export class LAppModel extends CubismUserModel {
     }
   }
 
-  /*
+  /**
   * 更改idle动作的名称.
   */
   public replaceIdleMotion(groupName: string) {
@@ -424,6 +427,29 @@ export class LAppModel extends CubismUserModel {
     this._motionIdleName = groupName;
     this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
   }
+
+  /**
+  * 嘴巴进行说话动作.
+  */
+  public mouthOpen() {
+    this._mouseOpen = true;
+  }
+
+  public mouthClose() {
+    this._mouseOpen = false;
+  }
+
+  /**
+  * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布.
+  */
+  public lookAt(pointX: number, pointY: number) {
+
+    const rect = canvas.getBoundingClientRect();
+    const posX = pointX - rect.left;
+    const posY = pointY - rect.top;
+    this._dragManager.set(posX, posY);
+  }
+
   /**
    * 设置参数指定的面部表情运动
    *
