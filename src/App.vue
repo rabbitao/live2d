@@ -22,7 +22,12 @@ export default class App extends Vue {
     }
     this.live2dmanager = LAppLive2DManager.getInstance();
     lappdelegate.run();
-    this.live2dmanager.addModel({path: '/resource/momo/', modelName: 'momo'});
+    this.live2dmanager.addModel({path: '/resource/momo/', modelName: 'momo'}).then((model) => {
+      (window as any).momo = model;
+    });
+    this.live2dmanager.addModel({path: '/resource/effects/', modelName: 'momo_effect'}).then((model) => {
+      (window as any).effect = model;
+    });
   }
   public beforeDestroy() {
     if (this.live2dmanager) {
