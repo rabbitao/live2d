@@ -76,7 +76,7 @@ export namespace Live2DCubismFramework {
     protected _model: CubismModel;            // 模型实例
 
     protected _motionManager: CubismMotionManager;    // 运动管理
-    protected _motionQueue: Array<CubismMotionParam>; // 动作队列
+    protected _motionQueue: CubismMotionParam[]; // 动作队列
     protected _motionIdleName: string; // 默认发呆的动作名称
     protected _expressionManager: CubismMotionManager;    // 面部表情管理
     protected _eyeBlink: CubismEyeBlink;         // 自动闪烁

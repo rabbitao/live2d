@@ -99,7 +99,7 @@ export namespace Live2DCubismFramework {
             clearInterval(time as number);
             time = null;
             if (Object.prototype.toString.call(callback) === '[object Function]') {
-              (callback as Function)()
+              (callback as (() => void))();
             }
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
             resolve(model);

@@ -371,47 +371,35 @@ export class LAppModel extends CubismUserModel {
 
     const no: number = Math.floor(Math.random() * this._modelSetting.getMotionCount(group));
 
-    return this.startMotion({groupName: group, no: no, priority: priority});
+    return this.startMotion({groupName: group, no, priority});
   }
 
   /**
    * 执行一组动作。
    */
-  public startMotionQueue(motions: Array<CubismMotionParam>, clear: boolean = false) {
+  public startMotionQueue(motions: CubismMotionParam[], clear: boolean = false) {
     if (clear) {
-      this._motionQueue = []
-      this._motionQueue = motions
+      this._motionQueue = [];
+      this._motionQueue = motions;
     } else {
-      this._motionQueue = this._motionQueue.concat(motions)
+      this._motionQueue = this._motionQueue.concat(motions);
     }
     this.executeMotionQueue();
-  }
-  /**
-   * 执行一组动作。
-   */
-  private executeMotionQueue() {
-    if (this._motionQueue.length <= 0) {
-      return
-    }
-    let motionParam = this._motionQueue.shift();
-    this.startMotion(motionParam).then(() => {
-      this.executeMotionQueue();
-    })
   }
 
   /*
    * 停止所有动作 清除动作队列 已执行的动作如果有回调函数依旧会执行.
    */
   public stopAllMotions() {
-    this._motionQueue = []
-    this._motionManager.stopAllMotions()
+    this._motionQueue = [];
+    this._motionManager.stopAllMotions();
   }
 
   /*
   * 更改idle动作的名称.
   */
   public replaceIdleMotion(groupName: string) {
-    this._motionManager.stopAllMotions()
+    this._motionManager.stopAllMotions();
     this._motionIdleName = groupName;
     this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
   }
@@ -601,6 +589,18 @@ export class LAppModel extends CubismUserModel {
 
       this.doDraw();
     }
+  }
+  /**
+   * 执行一组动作。
+   */
+  private executeMotionQueue() {
+    if (this._motionQueue.length <= 0) {
+      return;
+    }
+    let motionParam = this._motionQueue.shift();
+    this.startMotion(motionParam).then(() => {
+      this.executeMotionQueue();
+    });
   }
 
   /**
