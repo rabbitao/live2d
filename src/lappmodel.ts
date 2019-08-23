@@ -384,14 +384,24 @@ export class LAppModel extends CubismUserModel {
   /**
    * 执行一组动作。
    */
-  public startMotionQueue(motions: CubismMotionParam[], clear: boolean = false) {
-    if (clear) {
-      this._motionQueue = [];
-      this._motionQueue = motions;
-    } else {
-      this._motionQueue = this._motionQueue.concat(motions);
-    }
-    this.executeMotionQueue();
+  public startMotionQueue(motions: CubismMotionParam[], clear: boolean = false): Promise<CubismUserModel> {
+    return new Promise((resolve) => {
+      if (clear) {
+        this._motionQueue = [];
+        this._motionQueue = motions;
+      } else {
+        this._motionQueue = this._motionQueue.concat(motions);
+      }
+      this.executeMotionQueue();
+      let timer: number | null = 0;
+      timer = setInterval(() => {
+        if (this._motionQueue.length === 0) {
+          resolve(this);
+          clearInterval(timer as number);
+          timer = null;
+        }
+      }, 50);
+    });
   }
 
   /**
@@ -618,8 +628,9 @@ export class LAppModel extends CubismUserModel {
     if (this._motionQueue.length <= 0) {
       return;
     }
-    let motionParam = this._motionQueue.shift();
-    this.startMotion(motionParam).then(() => {
+
+    this.startMotion(this._motionQueue[0]).then(() => {
+      this._motionQueue.shift();
       this.executeMotionQueue();
     });
   }
