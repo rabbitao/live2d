@@ -192,7 +192,7 @@ export class LAppModel extends CubismUserModel {
    * 更新
    */
   public update(): void {
-    if (this._state != LoadStep.CompleteSetup) { return; }
+    if (this._state != LoadStep.CompleteSetup || this._modelClear) { return; }
 
     const deltaTimeSeconds: number = LAppPal.getDeltaTime();
     this._userTimeSeconds += deltaTimeSeconds;
@@ -365,11 +365,11 @@ export class LAppModel extends CubismUserModel {
    * @param priority 优先级
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 当你无法开始时返回[-1]
    */
-  public startRandomMotion(group: string, priority: number): Promise<CubismUserModel> {
+  public startRandomMotion(group: string, priority?: number): Promise<CubismUserModel> {
     if (this._modelSetting.getMotionCount(group) == 0) {
       return InvalidMotionQueueEntryHandleValue;
     }
-
+    priority = priority || 2;
     const no: number = Math.floor(Math.random() * this._modelSetting.getMotionCount(group));
 
     return this.startMotion({groupName: group, no, priority});
@@ -396,7 +396,7 @@ export class LAppModel extends CubismUserModel {
     this._motionQueue = [];
     this._motionManager.stopAllMotions();
     if (clear) {
-      this.clear()
+      this.clear();
     }
   }
 
@@ -574,7 +574,7 @@ export class LAppModel extends CubismUserModel {
       canvas.width,
       canvas.height,
     ];
-    
+
     this.getRenderer().setRenderState(frameBuffer, viewport);
     this.getRenderer().drawModel();
   }
