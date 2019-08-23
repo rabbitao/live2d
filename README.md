@@ -2,7 +2,7 @@
 ## model对象支持的方法
 ``` javascript
 /** 执行一个指定的动画
- * @Param object: { groupName: 动作组名称
+ * @param object: { groupName: 动作组名称
  *                  no: 动作索引. 当前动作组内如果有多个动画, 执行索引指定的那个. 默认为0
  *                  priority: 动画权重(默认2).
  *                  callback: 当前动作执行完毕后触发
