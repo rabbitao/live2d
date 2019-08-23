@@ -296,6 +296,7 @@ export class LAppModel extends CubismUserModel {
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
   public startMotion(motionParams: CubismMotionParam = {groupName: '', no: 0, priority: 2}): Promise<CubismUserModel> {
+    this._modelClear = false;
     motionParams.no = motionParams.no || 0;
     motionParams.priority = motionParams.priority || 2;
     if (motionParams.priority == LAppDefine.PriorityForce) {
@@ -387,12 +388,16 @@ export class LAppModel extends CubismUserModel {
     this.executeMotionQueue();
   }
 
-  /*
+  /**
    * 停止所有动作 清除动作队列 已执行的动作如果有回调函数依旧会执行.
+   * @Param clear 是否清除画布内容
    */
-  public stopAllMotions() {
+  public stopAllMotions(clear: boolean) {
     this._motionQueue = [];
     this._motionManager.stopAllMotions();
+    if (clear) {
+      this.clear()
+    }
   }
 
   /*
@@ -560,7 +565,7 @@ export class LAppModel extends CubismUserModel {
    * 绘制模型的过程。 通过空间的View-Projection矩阵绘制模型。
    */
   public doDraw(): void {
-    if (this._model == null) { return; }
+    if (this._model == null || this._modelClear) { return; }
 
     // 画布大小
     const viewport: number[] = [
@@ -569,8 +574,18 @@ export class LAppModel extends CubismUserModel {
       canvas.width,
       canvas.height,
     ];
+    
     this.getRenderer().setRenderState(frameBuffer, viewport);
     this.getRenderer().drawModel();
+  }
+
+  /**
+   * 清除画布
+   */
+  public clear() {
+    this._modelClear = true;
+    gl.clearColor(1, 1, 1, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
   }
 
   /**

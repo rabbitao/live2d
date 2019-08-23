@@ -72,8 +72,9 @@ export namespace Live2DCubismFramework {
       }
     }
 
-    protected _moc: CubismMoc;              // Moc数据
-    protected _model: CubismModel;            // 模型实例
+    protected _moc: CubismMoc;        // Moc数据
+    protected _model: CubismModel;    // 模型实例
+    protected _modelClear: boolean;   // 清除画布 不显示模型
 
     protected _motionManager: CubismMotionManager;    // 运动管理
     protected _motionQueue: CubismMotionParam[]; // 动作队列
@@ -133,6 +134,7 @@ export namespace Live2DCubismFramework {
       this._renderer = null as any;
       this._motionQueue = [];
       this._motionIdleName = LAppDefine.MotionGroupIdle;
+      this._modelClear = false;
 
       // 创建一个运动管理器
       this._motionManager = new CubismMotionManager();
