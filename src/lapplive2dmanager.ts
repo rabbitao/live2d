@@ -29,9 +29,9 @@ export class LAppLive2DManager {
    *
    * @return 一个类的实例
    */
-  public static getInstance(resource: { path: string, modelName: string }): LAppLive2DManager {
+  public static getInstance(): LAppLive2DManager {
     if (s_instance == null) {
-      s_instance = new LAppLive2DManager(resource);
+      s_instance = new LAppLive2DManager();
     }
 
     return s_instance;
@@ -50,14 +50,15 @@ export class LAppLive2DManager {
 
   public _viewMatrix: Csm_CubismMatrix44;    // 用于模型绘制的视图矩阵
   public _models: Csm_csmVector<LAppModel>;  // 模型实例容器
+  public _userModels: LAppModel[]; // 外部使用的model数组
 
   /**
    * 构造函数
    */
-  constructor(resource: {path: string, modelName: string}) {
+  constructor() {
     this._viewMatrix = new Csm_CubismMatrix44();
     this._models = new Csm_csmVector<LAppModel>();
-    this.loadScene(resource);
+    this._userModels = [];
   }
 
   /**
@@ -66,9 +67,15 @@ export class LAppLive2DManager {
    * @param no 模型列表索引值
    * @return 返回模型的实例。 如果索引值超出范围，则返回NULL。
    */
-  public getModel(no: number): LAppModel {
-    if (no < this._models.getSize()) {
-      return this._models.at(no);
+  public getModel(nameOrIndex: string | number): LAppModel {
+    if (typeof (nameOrIndex) === 'number' && nameOrIndex < this._models.getSize()) {
+      return this._models.at(nameOrIndex);
+    } else {
+      for (let i: number = 0; i < this._models.getSize(); i++) {
+        if (this._models.at(i)._modelName === nameOrIndex) {
+          return this._models.at(i);
+        }
+      }
     }
 
     return null as any;
@@ -159,18 +166,25 @@ export class LAppLive2DManager {
    * 切换场景
    * 在示例应用程序中，切换模型集。
    */
-  public loadScene(resource: { path: string, modelName: string }): void {
-    if (LAppDefine.DebugLogEnable) {
-      LAppPal.printLog('[APP]model {0}', resource.modelName);
-    }
-    resource.modelName += '.model3.json';
+  public addModel(resource: { path: string, modelName: string }): Promise<LAppModel | null> {
+    return new Promise((resolve) => {
+      if (LAppDefine.DebugLogEnable) {
+        LAppPal.printLog('[APP]model {0}', resource.modelName);
+      }
+      let modelFileName = resource.modelName + '.model3.json';
 
-    this.releaseAllModel();
-    this._models.pushBack(new LAppModel(resource));
-    this._models.at(0).loadAssets(resource.path, resource.modelName);
-    this._models.at(0).motionEventFired = () => {
-      console.log('event call');
-    };
-    (window as any).model = this._models.at(0);
+      // this.releaseAllModel();
+      let mdl = this.getModel(resource.modelName);
+      if (mdl) {
+        resolve(mdl);
+      }
+      let newModel = new LAppModel(resource);
+      this._models.pushBack(newModel);
+      newModel.loadAssets(resource.path, modelFileName, resource.modelName).then(() => {
+        resolve(newModel);
+      }).catch(() => {
+        resolve(null);
+      });
+    });
   }
 }

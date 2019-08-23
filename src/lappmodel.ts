@@ -156,27 +156,33 @@ export class LAppModel extends CubismUserModel {
    * @param dir
    * @param fileName
    */
-  public loadAssets(dir: string, fileName: string): void {
-    this._modelHomeDir = dir;
+  public loadAssets(dir: string, fileName: string, modelName: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._modelHomeDir = dir;
+      this._modelName = modelName;
+      const path: string = dir + fileName;
+      fetch(path).then(
+        (response) => {
+          return response.arrayBuffer();
+        },
+      ).then(
+        (arrayBuffer) => {
+          const buffer: ArrayBuffer = arrayBuffer;
+          const size = buffer.byteLength;
+          const setting: ICubismModelSetting = new CubismModelSettingJson(buffer, size);
 
-    const path: string = dir + fileName;
-    fetch(path).then(
-      (response) => {
-        return response.arrayBuffer();
-      },
-    ).then(
-      (arrayBuffer) => {
-        const buffer: ArrayBuffer = arrayBuffer;
-        const size = buffer.byteLength;
-        const setting: ICubismModelSetting = new CubismModelSettingJson(buffer, size);
+          // 更新状态
+          this._state = LoadStep.LoadModel;
 
-        // 更新状态
-        this._state = LoadStep.LoadModel;
-
-        // 保存结果
-        this.setupModel(setting);
-      },
-    );
+          // 保存结果
+          this.setupModel(setting).then(() => {
+            resolve(true);
+          }).catch(() => {
+            reject();
+          });
+        },
+      );
+    });
   }
 
   /**
@@ -624,49 +630,97 @@ export class LAppModel extends CubismUserModel {
    *
    * @param setting ICubismModelSetting的一个实例
    */
-  private setupModel(setting: ICubismModelSetting): void {
-    this._updating = true;
-    this._initialized = false;
+  private setupModel(setting: ICubismModelSetting): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._updating = true;
+      this._initialized = false;
 
-    this._modelSetting = setting;
+      this._modelSetting = setting;
 
-    let buffer: ArrayBuffer;
-    let size: number;
+      let buffer: ArrayBuffer;
+      let size: number;
 
-    // CubismModel
-    if (this._modelSetting.getModelFileName() != '') {
-      let path: string = this._modelSetting.getModelFileName();
-      path = this._modelHomeDir + path;
+      // CubismModel
+      if (this._modelSetting.getModelFileName() != '') {
+        let path: string = this._modelSetting.getModelFileName();
+        path = this._modelHomeDir + path;
 
-      fetch(path).then(
-        (response) => {
-          return response.arrayBuffer();
-        },
-      ).then(
-        (arrayBuffer) => {
-          buffer = arrayBuffer;
-          this.loadModel(buffer);
-          deleteBuffer(buffer, path);
-          this._state = LoadStep.LoadExpression;
+        fetch(path).then(
+          (response) => {
+            return response.arrayBuffer();
+          },
+        ).then(
+          (arrayBuffer) => {
+            buffer = arrayBuffer;
+            this.loadModel(buffer);
+            deleteBuffer(buffer, path);
+            this._state = LoadStep.LoadExpression;
+
+            // callback
+            loadCubismExpression();
+          },
+        );
+
+        this._state = LoadStep.WaitLoadModel;
+      } else {
+        LAppPal.printLog('Model data does not exist.');
+        reject();
+      }
+
+      // Expression
+      const loadCubismExpression = () => {
+        if (this._modelSetting.getExpressionCount() > 0) {
+          const count: number = this._modelSetting.getExpressionCount();
+
+          for (let i: number = 0; i < count; i++) {
+            const name: string = this._modelSetting.getExpressionName(i);
+            let path: string = this._modelSetting.getExpressionFileName(i);
+            path = this._modelHomeDir + path;
+
+            fetch(path).then(
+              (response) => {
+                return response.arrayBuffer();
+              },
+            ).then(
+              (arrayBuffer) => {
+                const buffer: ArrayBuffer = arrayBuffer;
+                const size: number = buffer.byteLength;
+
+                const motion: ACubismMotion = this.loadExpression(buffer, size, name);
+
+                if (this._expressions.getValue(name) != null) {
+                  ACubismMotion.delete(this._expressions.getValue(name));
+                  this._expressions.setValue(name, null as any);
+                }
+
+                this._expressions.setValue(name, motion);
+
+                deleteBuffer(buffer, path);
+
+                this._expressionCount++;
+
+                if (this._expressionCount >= count) {
+                  this._state = LoadStep.LoadPhysics;
+
+                  // callback
+                  loadCubismPhysics();
+                }
+              },
+            );
+          }
+          this._state = LoadStep.WaitLoadExpression;
+        } else {
+          this._state = LoadStep.LoadPhysics;
 
           // callback
-          loadCubismExpression();
-        },
-      );
+          loadCubismPhysics();
+        }
+      };
 
-      this._state = LoadStep.WaitLoadModel;
-    } else {
-      LAppPal.printLog('Model data does not exist.');
-    }
-
-    // Expression
-    const loadCubismExpression = () => {
-      if (this._modelSetting.getExpressionCount() > 0) {
-        const count: number = this._modelSetting.getExpressionCount();
-
-        for (let i: number = 0; i < count; i++) {
-          const name: string = this._modelSetting.getExpressionName(i);
-          let path: string = this._modelSetting.getExpressionFileName(i);
+      // Physics
+      const loadCubismPhysics = () => {
+        if (this._modelSetting.getPhysicsFileName() != '') {
+          let path: string = this._modelSetting.getPhysicsFileName();
           path = this._modelHomeDir + path;
 
           fetch(path).then(
@@ -678,241 +732,197 @@ export class LAppModel extends CubismUserModel {
               const buffer: ArrayBuffer = arrayBuffer;
               const size: number = buffer.byteLength;
 
-              const motion: ACubismMotion = this.loadExpression(buffer, size, name);
-
-              if (this._expressions.getValue(name) != null) {
-                ACubismMotion.delete(this._expressions.getValue(name));
-                this._expressions.setValue(name, null as any);
-              }
-
-              this._expressions.setValue(name, motion);
-
+              this.loadPhysics(buffer, size);
               deleteBuffer(buffer, path);
 
-              this._expressionCount++;
+              this._state = LoadStep.LoadPose;
 
-              if (this._expressionCount >= count) {
-                this._state = LoadStep.LoadPhysics;
-
-                // callback
-                loadCubismPhysics();
-              }
+              // callback
+              loadCubismPose();
             },
           );
+          this._state = LoadStep.WaitLoadPhysics;
+        } else {
+          this._state = LoadStep.LoadPose;
+
+          // callback
+          loadCubismPose();
         }
-        this._state = LoadStep.WaitLoadExpression;
-      } else {
-        this._state = LoadStep.LoadPhysics;
+      };
+
+      // Pose
+      const loadCubismPose = () => {
+        if (this._modelSetting.getPoseFileName() != '') {
+          let path: string = this._modelSetting.getPoseFileName();
+          path = this._modelHomeDir + path;
+
+          fetch(path).then(
+            (response) => {
+              return response.arrayBuffer();
+            },
+          ).then(
+            (arrayBuffer) => {
+              const buffer: ArrayBuffer = arrayBuffer;
+              const size: number = buffer.byteLength;
+
+              this.loadPose(buffer, size);
+              deleteBuffer(buffer, path);
+
+              this._state = LoadStep.SetupEyeBlink;
+
+              // callback
+              setupEyeBlink();
+            },
+          );
+          this._state = LoadStep.WaitLoadPose;
+        } else {
+          this._state = LoadStep.SetupEyeBlink;
+
+          // callback
+          setupEyeBlink();
+        }
+      };
+
+      // EyeBlink
+      const setupEyeBlink = () => {
+        if (this._modelSetting.getEyeBlinkParameterCount() > 0) {
+          this._eyeBlink = CubismEyeBlink.create(this._modelSetting);
+          this._state = LoadStep.SetupBreath;
+
+        }
 
         // callback
-        loadCubismPhysics();
-      }
-    };
+        setupBreath();
+      };
 
-    // Physics
-    const loadCubismPhysics = () => {
-      if (this._modelSetting.getPhysicsFileName() != '') {
-        let path: string = this._modelSetting.getPhysicsFileName();
-        path = this._modelHomeDir + path;
+      // Breath
+      const setupBreath = () => {
+        this._breath = CubismBreath.create();
 
-        fetch(path).then(
-          (response) => {
-            return response.arrayBuffer();
-          },
-        ).then(
-          (arrayBuffer) => {
-            const buffer: ArrayBuffer = arrayBuffer;
-            const size: number = buffer.byteLength;
+        const breathParameters: csmVector<BreathParameterData> = new csmVector();
+        breathParameters.pushBack(new BreathParameterData(this._idParamAngleX, 0.0, 15.0, 6.5345, 0.5));
+        breathParameters.pushBack(new BreathParameterData(this._idParamAngleY, 0.0, 8.0, 3.5345, 0.5));
+        breathParameters.pushBack(new BreathParameterData(this._idParamAngleZ, 0.0, 10.0, 5.5345, 0.5));
+        breathParameters.pushBack(new BreathParameterData(this._idParamBodyAngleX, 0.0, 4.0, 15.5345, 0.5));
+        breathParameters.pushBack(new BreathParameterData(CubismFramework.getIdManager().getId(CubismDefaultParameterId.ParamBreath), 0.0, 0.5, 3.2345, 0.5));
 
-            this.loadPhysics(buffer, size);
-            deleteBuffer(buffer, path);
-
-            this._state = LoadStep.LoadPose;
-
-            // callback
-            loadCubismPose();
-          },
-        );
-        this._state = LoadStep.WaitLoadPhysics;
-      } else {
-        this._state = LoadStep.LoadPose;
+        this._breath.setParameters(breathParameters);
+        this._state = LoadStep.LoadUserData;
 
         // callback
-        loadCubismPose();
-      }
-    };
+        loadUserData();
+      };
 
-    // Pose
-    const loadCubismPose = () => {
-      if (this._modelSetting.getPoseFileName() != '') {
-        let path: string = this._modelSetting.getPoseFileName();
-        path = this._modelHomeDir + path;
+      // UserData
+      const loadUserData = () => {
+        if (this._modelSetting.getUserDataFile() != '') {
+          let path: string = this._modelSetting.getUserDataFile();
+          path = this._modelHomeDir + path;
 
-        fetch(path).then(
-          (response) => {
-            return response.arrayBuffer();
-          },
-        ).then(
-          (arrayBuffer) => {
-            const buffer: ArrayBuffer = arrayBuffer;
-            const size: number = buffer.byteLength;
+          fetch(path).then(
+            (response) => {
+              return response.arrayBuffer();
+            },
+          ).then(
+            (arrayBuffer) => {
+              const buffer: ArrayBuffer = arrayBuffer;
+              const size: number = buffer.byteLength;
 
-            this.loadPose(buffer, size);
-            deleteBuffer(buffer, path);
+              this.loadUserData(buffer, size);
+              deleteBuffer(buffer, path);
 
-            this._state = LoadStep.SetupEyeBlink;
+              this._state = LoadStep.SetupEyeBlinkIds;
 
-            // callback
-            setupEyeBlink();
-          },
-        );
-        this._state = LoadStep.WaitLoadPose;
-      } else {
-        this._state = LoadStep.SetupEyeBlink;
+              // callback
+              setupEyeBlinkIds();
+            },
+          );
 
-        // callback
-        setupEyeBlink();
-      }
-    };
+          this._state = LoadStep.WaitLoadUserData;
+        } else {
+          this._state = LoadStep.SetupEyeBlinkIds;
 
-    // EyeBlink
-    const setupEyeBlink = () => {
-      if (this._modelSetting.getEyeBlinkParameterCount() > 0) {
-        this._eyeBlink = CubismEyeBlink.create(this._modelSetting);
-        this._state = LoadStep.SetupBreath;
+          // callback
+          setupEyeBlinkIds();
+        }
+      };
 
-      }
+      // EyeBlinkIds
+      const setupEyeBlinkIds = () => {
+        const eyeBlinkIdCount: number = this._modelSetting.getEyeBlinkParameterCount();
 
-      // callback
-      setupBreath();
-    };
+        for (let i: number = 0; i < eyeBlinkIdCount; ++i) {
+          this._eyeBlinkIds.pushBack(this._modelSetting.getEyeBlinkParameterId(i));
+        }
 
-    // Breath
-    const setupBreath = () => {
-      this._breath = CubismBreath.create();
-
-      const breathParameters: csmVector<BreathParameterData> = new csmVector();
-      breathParameters.pushBack(new BreathParameterData(this._idParamAngleX, 0.0, 15.0, 6.5345, 0.5));
-      breathParameters.pushBack(new BreathParameterData(this._idParamAngleY, 0.0, 8.0, 3.5345, 0.5));
-      breathParameters.pushBack(new BreathParameterData(this._idParamAngleZ, 0.0, 10.0, 5.5345, 0.5));
-      breathParameters.pushBack(new BreathParameterData(this._idParamBodyAngleX, 0.0, 4.0, 15.5345, 0.5));
-      breathParameters.pushBack(new BreathParameterData(CubismFramework.getIdManager().getId(CubismDefaultParameterId.ParamBreath), 0.0, 0.5, 3.2345, 0.5));
-
-      this._breath.setParameters(breathParameters);
-      this._state = LoadStep.LoadUserData;
-
-      // callback
-      loadUserData();
-    };
-
-    // UserData
-    const loadUserData = () => {
-      if (this._modelSetting.getUserDataFile() != '') {
-        let path: string = this._modelSetting.getUserDataFile();
-        path = this._modelHomeDir + path;
-
-        fetch(path).then(
-          (response) => {
-            return response.arrayBuffer();
-          },
-        ).then(
-          (arrayBuffer) => {
-            const buffer: ArrayBuffer = arrayBuffer;
-            const size: number = buffer.byteLength;
-
-            this.loadUserData(buffer, size);
-            deleteBuffer(buffer, path);
-
-            this._state = LoadStep.SetupEyeBlinkIds;
-
-            // callback
-            setupEyeBlinkIds();
-          },
-        );
-
-        this._state = LoadStep.WaitLoadUserData;
-      } else {
-        this._state = LoadStep.SetupEyeBlinkIds;
+        this._state = LoadStep.SetupLipSyncIds;
 
         // callback
-        setupEyeBlinkIds();
-      }
-    };
+        setupLipSyncIds();
+      };
 
-    // EyeBlinkIds
-    const setupEyeBlinkIds = () => {
-      const eyeBlinkIdCount: number = this._modelSetting.getEyeBlinkParameterCount();
+      // LipSyncIds
+      const setupLipSyncIds = () => {
+        const lipSyncIdCount = this._modelSetting.getLipSyncParameterCount();
 
-      for (let i: number = 0; i < eyeBlinkIdCount; ++i) {
-        this._eyeBlinkIds.pushBack(this._modelSetting.getEyeBlinkParameterId(i));
-      }
+        for (let i: number = 0; i < lipSyncIdCount; ++i) {
+          this._lipSyncIds.pushBack(this._modelSetting.getLipSyncParameterId(i));
+        }
+        this._state = LoadStep.SetupLayout;
 
-      this._state = LoadStep.SetupLipSyncIds;
+        // callback
+        setupLayout();
+      };
 
-      // callback
-      setupLipSyncIds();
-    };
+      // Layout
+      const setupLayout = () => {
+        const layout: csmMap<string, number> = new csmMap<string, number>();
+        this._modelSetting.getLayoutMap(layout);
+        this._modelMatrix.setupFromLayout(layout);
+        this._state = LoadStep.LoadMotion;
 
-    // LipSyncIds
-    const setupLipSyncIds = () => {
-      const lipSyncIdCount = this._modelSetting.getLipSyncParameterCount();
+        // callback
+        loadCubismMotion();
+      };
 
-      for (let i: number = 0; i < lipSyncIdCount; ++i) {
-        this._lipSyncIds.pushBack(this._modelSetting.getLipSyncParameterId(i));
-      }
-      this._state = LoadStep.SetupLayout;
+      // Motion
+      const loadCubismMotion = () => {
+        this._state = LoadStep.WaitLoadMotion;
+        this._model.saveParameters();
+        this._allMotionCount = 0;
+        this._motionCount = 0;
+        const group: string[] = [];
 
-      // callback
-      setupLayout();
-    };
+        const motionGroupCount: number = this._modelSetting.getMotionGroupCount();
 
-    // Layout
-    const setupLayout = () => {
-      const layout: csmMap<string, number> = new csmMap<string, number>();
-      this._modelSetting.getLayoutMap(layout);
-      this._modelMatrix.setupFromLayout(layout);
-      this._state = LoadStep.LoadMotion;
+        // 找出动作的总数
+        for (let i: number = 0; i < motionGroupCount; i++) {
+          group[i] = this._modelSetting.getMotionGroupName(i);
+          this._allMotionCount += this._modelSetting.getMotionCount(group[i]);
+        }
 
-      // callback
-      loadCubismMotion();
-    };
+        // 加载动作
+        for (let i: number = 0; i < motionGroupCount; i++) {
+          this.preLoadMotionGroup(group[i]);
+        }
 
-    // Motion
-    const loadCubismMotion = () => {
-      this._state = LoadStep.WaitLoadMotion;
-      this._model.saveParameters();
-      this._allMotionCount = 0;
-      this._motionCount = 0;
-      const group: string[] = [];
+        // 没有动作的时候
+        if (motionGroupCount == 0) {
+          this._state = LoadStep.LoadTexture;
 
-      const motionGroupCount: number = this._modelSetting.getMotionGroupCount();
+          // 停止所有动作
+          this._motionManager.stopAllMotions();
 
-      // 找出动作的总数
-      for (let i: number = 0; i < motionGroupCount; i++) {
-        group[i] = this._modelSetting.getMotionGroupName(i);
-        this._allMotionCount += this._modelSetting.getMotionCount(group[i]);
-      }
+          this._updating = false;
+          this._initialized = true;
 
-      // 加载动作
-      for (let i: number = 0; i < motionGroupCount; i++) {
-        this.preLoadMotionGroup(group[i]);
-      }
-
-      // 没有动作的时候
-      if (motionGroupCount == 0) {
-        this._state = LoadStep.LoadTexture;
-
-        // 停止所有动作
-        this._motionManager.stopAllMotions();
-
-        this._updating = false;
-        this._initialized = true;
-
-        this.createRenderer();
-        this.setupTextures();
-        this.getRenderer().startUp(gl);
-      }
-    };
+          this.createRenderer();
+          this.setupTextures();
+          this.getRenderer().startUp(gl);
+        }
+        resolve(true);
+      };
+    });
   }
 
   /**
@@ -950,7 +960,7 @@ export class LAppModel extends CubismUserModel {
         };
 
         // 阅读
-        LAppDelegate.getInstance(this._modelResource).getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
+        LAppDelegate.getInstance().getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
         this.getRenderer().setIsPremultipliedAlpha(usePremultiply);
       }
 

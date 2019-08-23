@@ -30,15 +30,13 @@ export class LAppView {
   public _gear: LAppSprite;                      // 齿轮图像
   public _changeModel: boolean = false;                  // 模型切换标志
   public _isClick: boolean = false;                      // 点击
-  public _modelResource: { path: string, modelName: string }; // 模型资源
   /**
    * 构造函数
    */
-  constructor(resource: { path: string, modelName: string }) {
+  constructor() {
     this._programId = null as any;
     this._back = null as any;
     this._gear = null as any;
-    this._modelResource = resource;
 
     // 与触摸相关的事件管理
     this._touchManager = new TouchManager();
@@ -117,7 +115,7 @@ export class LAppView {
 
     gl.flush();
 
-    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance(this._modelResource);
+    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
 
     live2DManager.onUpdate();
   }
@@ -129,7 +127,7 @@ export class LAppView {
     const width: number = canvas.width;
     const height: number = canvas.height;
 
-    const textureManager = LAppDelegate.getInstance(this._modelResource).getTextureManager();
+    const textureManager = LAppDelegate.getInstance().getTextureManager();
     const resourcesPath = LAppDefine.ResourcesPath;
 
     let imageName: string = '';
@@ -163,7 +161,7 @@ export class LAppView {
 
     // 创建着色器
     if (this._programId == null) {
-      this._programId = LAppDelegate.getInstance(this._modelResource).createShader();
+      this._programId = LAppDelegate.getInstance().createShader();
     }
   }
 
@@ -189,7 +187,7 @@ export class LAppView {
 
     this._touchManager.touchesMoved(pointX, pointY);
 
-    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance(this._modelResource);
+    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
     live2DManager.onDrag(viewX, viewY);
   }
 
@@ -201,7 +199,7 @@ export class LAppView {
    */
   public onTouchesEnded(pointX: number, pointY: number): void {
     // 触摸结束
-    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance(this._modelResource);
+    const live2DManager: LAppLive2DManager = LAppLive2DManager.getInstance();
     live2DManager.onDrag(0.0, 0.0);
 
     {

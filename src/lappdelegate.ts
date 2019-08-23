@@ -31,9 +31,9 @@ export class LAppDelegate {
    *
    * @return 一个类的实例
    */
-  public static getInstance(resource: { path: string, modelName: string }): LAppDelegate {
+  public static getInstance(): LAppDelegate {
     if (s_instance == null) {
-      s_instance = new LAppDelegate(resource);
+      s_instance = new LAppDelegate();
     }
 
     return s_instance;
@@ -57,20 +57,18 @@ export class LAppDelegate {
   public _mouseY: number;                    // 鼠标Y坐标
   public _isEnd: boolean;                    // APP终止了吗
   public _textureManager: LAppTextureManager; // 纹理管理
-  public _modelResource: { path: string, modelName: string }; // 模型资源
 
   /**
    * 构造函数
    */
-  constructor(resource: { path: string, modelName: string }) {
+  constructor() {
     this._captured = false;
     this._mouseX = 0.0;
     this._mouseY = 0.0;
     this._isEnd = false;
-    this._modelResource = resource;
 
     this._cubismOption = new Csm_Option();
-    this._view = new LAppView(resource);
+    this._view = new LAppView();
     this._textureManager = new LAppTextureManager();
   }
 
@@ -227,7 +225,6 @@ export class LAppDelegate {
 
     // Cubism3初始化
     this.initializeCubism();
-
     return true;
   }
 
@@ -373,9 +370,6 @@ export class LAppDelegate {
 
     // initialize cubism
     Csm_CubismFramework.initialize();
-
-    // load model
-    LAppLive2DManager.getInstance(this._modelResource);
 
     // default proj
     const projection: Csm_CubismMatrix44 = new Csm_CubismMatrix44();

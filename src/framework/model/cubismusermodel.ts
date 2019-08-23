@@ -71,6 +71,7 @@ export namespace Live2DCubismFramework {
         model.motionEventFired(eventValue);
       }
     }
+    public _modelName: string;        // 模型名称
 
     protected _moc: CubismMoc;        // Moc数据
     protected _model: CubismModel;    // 模型实例
@@ -135,6 +136,7 @@ export namespace Live2DCubismFramework {
       this._motionQueue = [];
       this._motionIdleName = LAppDefine.MotionGroupIdle;
       this._modelClear = false;
+      this._modelName = '';
 
       // 创建一个运动管理器
       this._motionManager = new CubismMotionManager();
