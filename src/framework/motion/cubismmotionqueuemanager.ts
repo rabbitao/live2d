@@ -116,7 +116,9 @@ export namespace Live2DCubismFramework {
     public isFinished(): boolean {
       // ------- 执行的过程 -------
       // 如果已经有动作，则提高结束标志
-
+      if (!this._motions) {
+        return true;
+      }
       for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
         let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
 
