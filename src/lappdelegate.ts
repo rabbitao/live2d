@@ -77,7 +77,7 @@ export class LAppDelegate {
    */
   public initialize(): boolean {
     // 获得画布
-    canvas = document.getElementById('SAMPLE') as HTMLCanvasElement;
+    canvas = document.getElementById('live2d-core-canvas') as HTMLCanvasElement;
 
     // 初始化gl上下文
     gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as any;

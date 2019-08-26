@@ -1,4 +1,4 @@
-# live2d3
+# live2d 3.0 in vue project
 ## model对象支持的方法
 ``` javascript
 /** 执行一个指定的动画
@@ -9,7 +9,7 @@
  *                }
  * @return Promise<Model>
  */
-Promise startMotion({groupName: string, no?: number, priority?: number, callback?: () => void})
+public Promise startMotion({groupName: string, no?: number, priority?: number, callback?: () => void})
 ```
 
 ``` javascript
@@ -18,7 +18,7 @@ Promise startMotion({groupName: string, no?: number, priority?: number, callback
  * @param priority: 动画权重(默认2)
  * @return Promise<Model>
  */
-Promise startRandomMotion(groupName: string, priority?: number)
+public Promise startRandomMotion(groupName: string, priority?: number)
 ```
 
 ``` javascript
@@ -27,42 +27,56 @@ Promise startRandomMotion(groupName: string, priority?: number)
  * @param clear: 为true则清除当前已存在的队列. 否则进行队列追加.  默认false. 
  * @return Promise<Model>
  */
-Promise startMotionQueue([{groupName: string, no?: number, priority?: number, callback?: () => void}], clear?: boolean)
+public Promise startMotionQueue([{groupName: string, no?: number, priority?: number, callback?: () => void}], clear?: boolean)
 ```
   
 ``` javascript
 /** 停止全部动作
  * @param clear: 停止动作后是否清除画板. (默认false. 停止动画后会执行idle, 没有idle时画布会保留当前动画的最后一帧)
  */
-void stopAllMotions(clear?: boolean)
+public void stopAllMotions(clear?: boolean)
 ```
 
 ``` javascript
 /** 用指定的动画组替换默认发呆的动画组. 该动画自动循环
  * @param groupName: 动画组名称
  */
-void replaceIdleMotion(groupName: string)
+public void replaceIdleMotion(groupName: string)
+```
+
+``` javascript
+/** 设置表情
+ * @param expressionId: 表情id(model3.json Expressions字段配置 例: f01)
+ */
+public void setExpression(expressionId: string)
+```
+
+``` javascript
+/** 
+ * 随机使用一个表情
+ */
+public void setRandomExpression()
 ```
 
 ``` javascript
 /** 
  *  清除画布 并终止默认的绘画动作
  */
-void clear()
+public void clear()
 ```
 
 ``` javascript
 /** 
  *  张嘴
  */
-void mouthOpen()
+public void mouthOpen()
 ```
 
 ``` javascript
 /** 
  *  闭嘴
  */
-void mouthClose()
+public void mouthClose()
 ```
 
 ``` javascript
@@ -72,7 +86,7 @@ void mouthClose()
  *  注: 坐标是以模型原点为(0,0)点, 进行象限分布
  *  例: 看向左下(第三象限) 坐标可为(-500, -500)
  */
-void lookAt(pointX: number, pointY: number)
+public void lookAt(pointX: number, pointY: number)
 ```
   
 ## Project setup
