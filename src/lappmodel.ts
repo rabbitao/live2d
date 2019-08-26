@@ -94,6 +94,7 @@ export class LAppModel extends CubismUserModel {
 
   public _modelSetting: ICubismModelSetting;      // 模型设定信息
   public _modelHomeDir: string;      // 放置模型设置的目录
+  public _modelTextures: string[];   // 用户指定的模型纹理
   public _userTimeSeconds: number;   // 增量时间的综合值[秒]
 
   public _eyeBlinkIds: csmVector<CubismIdHandle>;  // 模型中设置的闪烁功能的参数ID
@@ -153,13 +154,14 @@ export class LAppModel extends CubismUserModel {
     this._motionCount = 0;
     this._allMotionCount = 0;
     this._mouseOpen = false;
+    this._modelTextures = [];
   }
   /**
    * model3.json从目录和文件路径生成模型
    * @param dir
    * @param fileName
    */
-  public loadAssets(dir: string, fileName: string, modelName: string): Promise<boolean> {
+  public loadAssets(dir: string, fileName: string, modelName: string, textures?: string[]): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._modelHomeDir = dir;
       this._modelName = modelName;
@@ -461,7 +463,6 @@ export class LAppModel extends CubismUserModel {
     if (this._debugMode) {
       LAppPal.printLog('[APP]expression: [{0}]', expressionId);
     }
-
     if (motion != null) {
       this._expressionManager.startMotionPriority(motion, false, LAppDefine.PriorityForce, this);
     } else {
@@ -512,7 +513,6 @@ export class LAppModel extends CubismUserModel {
     }
 
     const count: number = this._modelSetting.getHitAreasCount();
-
     for (let i: number = 0; i < count; i++) {
       if (this._modelSetting.getHitAreaName(i) == hitArenaName) {
         const drawId: CubismIdHandle = this._modelSetting.getHitAreaId(i);
@@ -974,14 +974,21 @@ export class LAppModel extends CubismUserModel {
       const textureCount: number = this._modelSetting.getTextureCount();
 
       for (let modelTextureNumber = 0; modelTextureNumber < textureCount; modelTextureNumber++) {
+        let modelTextureName = this._modelSetting.getTextureFileName(modelTextureNumber);
         // 如果纹理名称是空字符，请跳过加载/绑定过程
-        if (this._modelSetting.getTextureFileName(modelTextureNumber) == '') {
+        if (modelTextureName == '') {
           console.log('getTextureFileName null');
           continue;
         }
+        // 如果用户指定了纹理名称 则只加载用户指定的纹理
+        if (this._modelTextures.length > 0) {
+          if (!this._modelTextures.includes(modelTextureName)) {
+            continue;
+          }
+        }
 
         // 将纹理加载到WebGL纹理单元中
-        let texturePath = this._modelSetting.getTextureFileName(modelTextureNumber);
+        let texturePath = modelTextureName;
         texturePath = this._modelHomeDir + texturePath;
 
         // 加载完成后调用的回调函数
