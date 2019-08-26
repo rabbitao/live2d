@@ -11,7 +11,7 @@
     "Motions": {
       "Idle": [
         {
-          "File": "motions/thinking.motion3.json",
+          "File": "motions/idle.motion3.json",
           "FadeInTime": 0.5,
           "FadeOutTime": 0.5
         }
@@ -79,6 +79,20 @@
           "FadeInTime": 0.5,
           "FadeOutTime": 0.5
         }
+      ],
+      "TapGem": [
+        {
+          "File": "motions/stretched.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
+      ],
+      "TapNose": [
+        {
+          "File": "motions/actingCute.motion3.json",
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5
+        }
       ]
     }
 	},
@@ -97,5 +111,32 @@
 				"ParamMouthOpenY"
 			]
 		}
-	]
+  ],
+  "HitAreas": [
+    {
+      "Name": "Nose",
+      "Id": "nose"
+    },
+    {
+      "Name": "Gem",
+      "Id": "baoshi"
+    },
+    {
+      "Name": "Body",
+      "Id": "body_01"
+    },
+    {
+      "Name": "Face",
+      "Id": "face"
+    }
+  ],
+  "HitParams": [
+    {
+      "Id": "ParamHeadX",
+      "HitArea": "02",
+      "Axis": 0,
+      "Factor": 0.0,
+      "LockParam": false
+    }
+  ]
 }

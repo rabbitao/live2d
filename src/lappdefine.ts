@@ -50,10 +50,16 @@ export namespace LAppDefine {
   // 与外部定义文件（json）匹配
   export const MotionGroupIdle: string = 'Idle'; // 待机
   export const MotionGroupTapBody: string = 'TapBody'; // 拍打身体时
+  export const MotionGroupTapNose: string = 'TapNose'; // 拍打鼻子时
+  export const MotionGroupTapGem: string = 'TapGem'; // 拍打宝石时
+  export const MotionGroupTapFace: string = 'TapFace'; // 拍打脸时
 
   // 与外部定义文件（json）匹配
   export const HitAreaNameHead: string = 'Head';
+  export const HitAreaNameFace: string = 'Face';
   export const HitAreaNameBody: string = 'Body';
+  export const HitAreaNameNose: string = 'Nose';
+  export const HitAreaNameGem: string = 'Gem';
 
   // 运动优先级常数
   export const PriorityNone: number = 0;

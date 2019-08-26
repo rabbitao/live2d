@@ -315,7 +315,6 @@ export namespace Live2DCubismFramework {
      */
     public isHit(drawableId: CubismIdHandle, pointX: number, pointY: number): boolean {
       const drawIndex: number = this._model.getDrawableIndex(drawableId);
-
       if (drawIndex < 0) {
         return false; // 如果不存在则为false
       }
@@ -351,7 +350,7 @@ export namespace Live2DCubismFramework {
 
       const tx: number = this._modelMatrix.invertTransformX(pointX);
       const ty: number = this._modelMatrix.invertTransformY(pointY);
-
+      
       return ((left <= tx) && (tx <= right) && (top <= ty) && (ty <= bottom));
     }
 

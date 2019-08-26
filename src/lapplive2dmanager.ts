@@ -120,7 +120,17 @@ export class LAppLive2DManager {
     }
 
     for (let i: number = 0; i < this._models.getSize(); i++) {
-      if (this._models.at(i).hitTest(LAppDefine.HitAreaNameHead, x, y)) {
+      if (this._models.at(i).hitTest(LAppDefine.HitAreaNameNose, x, y)) {
+        if (LAppDefine.DebugLogEnable) {
+          LAppPal.printLog('[APP]hit area: [{0}]', LAppDefine.HitAreaNameNose);
+        }
+        this._models.at(i).startRandomMotion(LAppDefine.MotionGroupTapNose, LAppDefine.PriorityNormal);
+      } else if (this._models.at(i).hitTest(LAppDefine.HitAreaNameGem, x, y)) {
+        if (LAppDefine.DebugLogEnable) {
+          LAppPal.printLog('[APP]hit area: [{0}]', LAppDefine.HitAreaNameGem);
+        }
+        this._models.at(i).startRandomMotion(LAppDefine.MotionGroupTapGem, LAppDefine.PriorityNormal);
+      } else if (this._models.at(i).hitTest(LAppDefine.HitAreaNameHead, x, y)) {
         if (LAppDefine.DebugLogEnable) {
           LAppPal.printLog('[APP]hit area: [{0}]', LAppDefine.HitAreaNameHead);
         }
