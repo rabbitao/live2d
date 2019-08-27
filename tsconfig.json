@@ -1,39 +1,36 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
+    "outDir": "./dist/", // 打包到的目录
+    "sourceMap": false, // 是否生成sourceMap（用于浏览器调试）
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "declarationMap": false, // 是否生成声明文件map文件（便于调试）
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "baseUrl": ".",
+    "module": "esnext",
+    "target": "es5", // 转化成的目标语言
+    "baseUrl": "./",
     "types": [
-      "webpack-env"
+      "node",
+      "jest"
     ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "lib": [
-      "esnext",
       "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+      "es2015"
+    ],
+    "jsx": "react",
+    "allowJs": true
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
-  ],
+    "src/core/live2dcubismcore.js"
+  ], // 要打包的文件
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "*.test.ts"
   ]
 }

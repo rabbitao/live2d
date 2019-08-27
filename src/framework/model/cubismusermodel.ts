@@ -44,7 +44,7 @@ import CubismModelMatrix = cubismmodelmatrix.CubismModelMatrix;
 import CubismTargetPoint = cubismtargetpoint.CubismTargetPoint;
 import CubismMotionManager = cubismmotionmanager.CubismMotionManager;
 import CubismMotionParam = userMotionParam.CubismMotionParam;
-import { LAppDefine } from '@/lappdefine';
+import { LAppDefine } from '../../lappdefine';
 
 export namespace Live2DCubismFramework {
   /**
@@ -350,7 +350,7 @@ export namespace Live2DCubismFramework {
 
       const tx: number = this._modelMatrix.invertTransformX(pointX);
       const ty: number = this._modelMatrix.invertTransformY(pointY);
-      
+
       return ((left <= tx) && (tx <= right) && (top <= ty) && (ty <= bottom));
     }
 

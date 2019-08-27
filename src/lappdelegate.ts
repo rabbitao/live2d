@@ -75,7 +75,25 @@ export class LAppDelegate {
   /**
    * 初始化您需要的APP。
    */
-  public initialize(): boolean {
+  public initialize(config: {width: number, height: number}): boolean {
+    // 创建html元素
+    let wrap = document.getElementById('live2d-core-wrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'live2d-core-wrap';
+      wrap.style.position = 'absolute';
+      wrap.style.width = '100%';
+      wrap.style.height = '100%';
+      canvas = document.createElement('canvas');
+      canvas.id = 'live2d-core-canvas';
+      canvas.style.position = 'absolute';
+      canvas.style.left = '0px';
+      canvas.style.top = '0px';
+      canvas.setAttribute('width', config.width.toString());
+      canvas.setAttribute('height', config.height.toString());
+      wrap.appendChild(canvas);
+      document.body.appendChild(wrap);
+    }
     // 获得画布
     canvas = document.getElementById('live2d-core-canvas') as HTMLCanvasElement;
 

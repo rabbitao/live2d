@@ -94,7 +94,7 @@ export namespace Live2DCubismFramework {
 
         this._motions.pushBack(motionQueueEntry);
         let time: number | null = 0;
-        time = setInterval(() => {
+        time = window.setInterval(() => {
           if (this.isFinished()) {
             clearInterval(time as number);
             time = null;

@@ -1,4 +1,24 @@
-# live2d 3.0 in vue project
+# 基于live2d 3.3.1
+## 初始化
+``` javascript
+import live2d from 'live2d'
+/** 初始化live2d
+ * @param object: {width: number, height:number} 画布的大小
+ */
+const live2dmanager = live2d.initialize({width: number, height:number})
+```
+
+``` javascript
+/** 添加模型
+ * @param object: { path: string, // 模型资源路径, 
+ *                  modelName: string,  // 模型名称,
+ *                  textures?: string[] // 纹理名称数组(为空则加载全部纹理)
+ *                }
+ * @return Promise<Model>
+ */
+public Promise live2dmanager.addModel({path: '/resource/momo/', modelName: 'momo'}).then((model) => {});
+```
+
 ## model对象支持的方法
 ``` javascript
 /** 执行一个指定的动画

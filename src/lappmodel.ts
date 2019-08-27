@@ -165,6 +165,7 @@ export class LAppModel extends CubismUserModel {
     return new Promise((resolve, reject) => {
       this._modelHomeDir = dir;
       this._modelName = modelName;
+      this._modelTextures = textures || [];
       const path: string = dir + fileName;
       fetch(path).then(
         (response) => {
@@ -399,7 +400,7 @@ export class LAppModel extends CubismUserModel {
       }
       this.executeMotionQueue();
       let timer: number | null = 0;
-      timer = setInterval(() => {
+      timer = window.setInterval(() => {
         if (this._motionQueue.length === 0) {
           resolve(this);
           clearInterval(timer as number);
