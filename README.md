@@ -1,7 +1,13 @@
 # 基于live2d 3.3.1
+## 安装
+``` bash
+$ yarn add find-live2d3
+or
+$ npm install find-live2d3
+```
 ## 初始化
 ``` javascript
-import live2d from 'live2d'
+import live2d from 'find-live2d3'
 /** 初始化live2d
  * @param object: {width: number, height:number} 画布的大小
  */
