@@ -25,7 +25,25 @@ const live2dmanager = live2d.initialize({width: number, height:number})
 public Promise live2dmanager.addModel({path: '/resource/momo/', modelName: 'momo'}).then((model) => {});
 ```
 
-## model对象支持的方法
+## model对象方法
+``` javascript
+/**
+ * 显示当前模型
+ * @param object: {
+ *                  pointX: 出现的x坐标. 默认0
+ *                  pointY: 出现的Y坐标. 默认0
+ *                }
+ */
+public void appear(param: { pointX: number, pointY: number})
+```
+
+``` javascript
+/**
+ * 隐藏当前模型
+ */
+public void disappear()
+```
+
 ``` javascript
 /** 执行一个指定的动画
  * @param object: { groupName: 动作组名称

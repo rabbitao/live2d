@@ -247,7 +247,7 @@ var LAppModel = /** @class */ (function (_super) {
     LAppModel.prototype.startMotion = function (motionParams) {
         var _this = this;
         if (motionParams === void 0) { motionParams = { groupName: '', no: 0, priority: 2 }; }
-        this._modelClear = false;
+        // this._modelClear = false;
         motionParams.no = motionParams.no || 0;
         motionParams.priority = motionParams.priority || 2;
         if (motionParams.priority == LAppDefine.PriorityForce) {
@@ -488,6 +488,25 @@ var LAppModel = /** @class */ (function (_super) {
         for (var i = 0; i < this._modelSetting.getMotionCount(group); i++) {
             _loop_1(i);
         }
+    };
+    /**
+     * 显示模型。
+     * @Param {pointX: number, pointY: number} 出现的坐标
+     */
+    LAppModel.prototype.appear = function (param) {
+        if (param.pointY) {
+            canvas.style.top = param.pointY + 'px';
+        }
+        if (param.pointX) {
+            canvas.style.left = param.pointX + 'px';
+        }
+        this._modelClear = false;
+    };
+    /**
+     * 隐藏模型。
+     */
+    LAppModel.prototype.disappear = function () {
+        this._modelClear = true;
     };
     /**
      * 释放所有运动数据。

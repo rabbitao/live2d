@@ -135,7 +135,7 @@ export namespace Live2DCubismFramework {
       this._renderer = null as any;
       this._motionQueue = [];
       this._motionIdleName = LAppDefine.MotionGroupIdle;
-      this._modelClear = false;
+      this._modelClear = true;
       this._modelName = '';
 
       // 创建一个运动管理器

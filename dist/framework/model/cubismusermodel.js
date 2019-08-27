@@ -71,7 +71,7 @@ export var Live2DCubismFramework;
             this._renderer = null;
             this._motionQueue = [];
             this._motionIdleName = LAppDefine.MotionGroupIdle;
-            this._modelClear = false;
+            this._modelClear = true;
             this._modelName = '';
             // 创建一个运动管理器
             this._motionManager = new CubismMotionManager();

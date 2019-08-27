@@ -139,6 +139,18 @@ export declare class LAppModel extends CubismUserModel {
      */
     preLoadMotionGroup(group: string): void;
     /**
+     * 显示模型。
+     * @Param {pointX: number, pointY: number} 出现的坐标
+     */
+    appear(param: {
+        pointX: number;
+        pointY: number;
+    }): void;
+    /**
+     * 隐藏模型。
+     */
+    disappear(): void;
+    /**
      * 释放所有运动数据。
      */
     releaseMotions(): void;
