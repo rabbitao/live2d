@@ -84,6 +84,8 @@ export class LAppDelegate {
       wrap.style.position = 'absolute';
       wrap.style.width = '100%';
       wrap.style.height = '100%';
+      wrap.style.top = '0px';
+      wrap.style.left = '0px';
       canvas = document.createElement('canvas');
       canvas.id = 'live2d-core-canvas';
       canvas.style.position = 'absolute';

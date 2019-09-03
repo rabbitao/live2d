@@ -159,7 +159,7 @@ var LAppLive2DManager = /** @class */ (function () {
             if (LAppDefine.DebugLogEnable) {
                 LAppPal.printLog('[APP]model {0}', resource.modelName);
             }
-            var modelFileName = resource.modelName + '.model3.json';
+            var modelFileName = resource.fileName + '.model3.json';
             // this.releaseAllModel();
             var mdl = _this.getModel(resource.modelName);
             if (mdl) {
@@ -167,7 +167,7 @@ var LAppLive2DManager = /** @class */ (function () {
             }
             var newModel = new LAppModel(resource);
             _this._models.pushBack(newModel);
-            newModel.loadAssets(resource.path, modelFileName, resource.modelName).then(function () {
+            newModel.loadAssets(resource.path, modelFileName, resource.fileName).then(function () {
                 resolve(newModel);
             }).catch(function () {
                 resolve(null);

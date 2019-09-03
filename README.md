@@ -17,12 +17,13 @@ const live2dmanager = live2d.initialize({width: number, height:number})
 ``` javascript
 /** 添加模型
  * @param object: { path: string, // 模型资源路径, 
+ *                  fileName: string    // 模型文件名称(.model3.json之前)
  *                  modelName: string,  // 模型名称,
  *                  textures?: string[] // 纹理名称数组(为空则加载全部纹理)
  *                }
  * @return Promise<Model>
  */
-public Promise live2dmanager.addModel({path: '/resource/momo/', modelName: 'momo'}).then((model) => {});
+public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo'}).then((model) => {});
 ```
 
 ## model对象方法

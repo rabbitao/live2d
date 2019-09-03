@@ -63,6 +63,7 @@ export declare class LAppLive2DManager {
      */
     addModel(resource: {
         path: string;
+        fileName: string;
         modelName: string;
     }): Promise<LAppModel | null>;
 }
