@@ -60,6 +60,9 @@ var LAppDelegate = /** @class */ (function () {
      */
     LAppDelegate.prototype.initialize = function (config) {
         var _this = this;
+        config.canvasId = config.canvasId || 'live2d-core-canvas';
+        config.width = config.width || 1000;
+        config.height = config.height || 800;
         // 创建html元素
         var wrap = document.getElementById('live2d-core-wrap');
         if (!wrap) {
@@ -70,18 +73,19 @@ var LAppDelegate = /** @class */ (function () {
             wrap.style.height = '100%';
             wrap.style.top = '0px';
             wrap.style.left = '0px';
+            document.body.appendChild(wrap);
+        }
+        canvas = document.getElementById(config.canvasId);
+        if (!canvas) {
             canvas = document.createElement('canvas');
-            canvas.id = 'live2d-core-canvas';
+            canvas.id = config.canvasId;
             canvas.style.position = 'absolute';
             canvas.style.left = '0px';
             canvas.style.top = '0px';
             canvas.setAttribute('width', config.width.toString());
             canvas.setAttribute('height', config.height.toString());
-            wrap.appendChild(canvas);
-            document.body.appendChild(wrap);
+            document.getElementById('live2d-core-wrap').appendChild(canvas);
         }
-        // 获得画布
-        canvas = document.getElementById('live2d-core-canvas');
         // 初始化gl上下文
         gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false }) || canvas.getContext('experimental-webgl');
         if (!gl) {

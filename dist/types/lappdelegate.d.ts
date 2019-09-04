@@ -36,6 +36,7 @@ export declare class LAppDelegate {
      * 初始化您需要的APP。
      */
     initialize(config: {
+        canvasId: string;
         width: number;
         height: number;
     }): boolean;
