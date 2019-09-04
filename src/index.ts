@@ -4,7 +4,7 @@ import { LAppLive2DManager } from './lapplive2dmanager';
 
 class live2d {
   private live2dmanager: LAppLive2DManager | null = null;
-  public initialize(config: { width: number, height: number }): LAppLive2DManager | null {
+  public initialize(config: { canvasId: string, width: number, height: number }): LAppLive2DManager | null {
     let lappdelegate = LAppDelegate.getInstance();
     if (lappdelegate.initialize(config) == false) {
       return null;

@@ -75,7 +75,10 @@ export class LAppDelegate {
   /**
    * 初始化您需要的APP。
    */
-  public initialize(config: {width: number, height: number}): boolean {
+  public initialize(config: { canvasId: string, width: number, height: number }): boolean {
+    config.canvasId = config.canvasId || 'live2d-core-canvas';
+    config.width = config.width || 1000;
+    config.height = config.height || 800;
     // 创建html元素
     let wrap = document.getElementById('live2d-core-wrap');
     if (!wrap) {
@@ -86,21 +89,22 @@ export class LAppDelegate {
       wrap.style.height = '100%';
       wrap.style.top = '0px';
       wrap.style.left = '0px';
+      document.body.appendChild(wrap);
+    }
+    canvas = document.getElementById(config.canvasId) as HTMLCanvasElement;
+    if (!canvas) {
       canvas = document.createElement('canvas');
-      canvas.id = 'live2d-core-canvas';
+      canvas.id = config.canvasId;
       canvas.style.position = 'absolute';
       canvas.style.left = '0px';
       canvas.style.top = '0px';
       canvas.setAttribute('width', config.width.toString());
       canvas.setAttribute('height', config.height.toString());
-      wrap.appendChild(canvas);
-      document.body.appendChild(wrap);
+      document.getElementById('live2d-core-wrap').appendChild(canvas);
     }
-    // 获得画布
-    canvas = document.getElementById('live2d-core-canvas') as HTMLCanvasElement;
 
     // 初始化gl上下文
-    gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl') as any;
+    gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false }) || canvas.getContext('experimental-webgl') as any;
 
     if (!gl) {
       alert('WebGL无法初始化。 浏览器似乎不支持');

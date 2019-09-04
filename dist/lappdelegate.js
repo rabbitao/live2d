@@ -83,7 +83,7 @@ var LAppDelegate = /** @class */ (function () {
         // 获得画布
         canvas = document.getElementById('live2d-core-canvas');
         // 初始化gl上下文
-        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false }) || canvas.getContext('experimental-webgl');
         if (!gl) {
             alert('WebGL无法初始化。 浏览器似乎不支持');
             gl = null;

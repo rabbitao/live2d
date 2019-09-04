@@ -9,9 +9,9 @@ $ npm install find-live2d3
 ``` javascript
 import live2d from 'find-live2d3'
 /** 初始化live2d
- * @param object: {width: number, height:number} 画布的大小
+ * @param object: {canvasId: string, width: number, height:number} 画布的id及大小
  */
-const live2dmanager = live2d.initialize({width: number, height:number})
+const live2dmanager = live2d.initialize({canvasId: string, width: number, height:number})
 ```
 
 ``` javascript
