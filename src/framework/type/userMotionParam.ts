@@ -3,6 +3,8 @@ export namespace Live2DCubismFramework {
     groupName: string;
     no: number;
     priority: number;
+    fadeInTime?: number;
+    fadeOutTime?: number;
     callback?: () => void;
   }
 }

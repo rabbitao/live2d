@@ -98,6 +98,7 @@ export class LAppDelegate {
       canvas.style.position = 'absolute';
       canvas.style.left = '0px';
       canvas.style.top = '0px';
+      canvas.style.zIndex = '100';
       canvas.setAttribute('width', config.width.toString());
       canvas.setAttribute('height', config.height.toString());
       document.getElementById('live2d-core-wrap').appendChild(canvas);

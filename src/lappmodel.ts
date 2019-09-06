@@ -317,7 +317,9 @@ export class LAppModel extends CubismUserModel {
       if (this._debugMode) {
         LAppPal.printLog('[APP]can\'t start motion.');
       }
-      return InvalidMotionQueueEntryHandleValue;
+      return new Promise<CubismUserModel>((reslove, reject) => {
+        reject('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue);
+      });
     }
 
     const fileName: string = this._modelSetting.getMotionFileName(motionParams.groupName, motionParams.no);
@@ -341,13 +343,13 @@ export class LAppModel extends CubismUserModel {
           const size = buffer.byteLength;
 
           motion = this.loadMotion(buffer, size, null as any) as CubismMotion;
-          let fadeTime: number = this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
+          let fadeTime: number = motionParams.fadeInTime || this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
 
           if (fadeTime >= 0.0) {
             motion.setFadeInTime(fadeTime);
           }
 
-          fadeTime = this._modelSetting.getMotionFadeOutTimeValue(motionParams.groupName, motionParams.no);
+          fadeTime = motionParams.fadeOutTime || this._modelSetting.getMotionFadeOutTimeValue(motionParams.groupName, motionParams.no);
           if (fadeTime >= 0.0) {
             motion.setFadeOutTime(fadeTime);
           }
@@ -594,12 +596,15 @@ export class LAppModel extends CubismUserModel {
    * 显示模型。
    * @Param {pointX: number, pointY: number} 出现的坐标
    */
-  public appear(param: { pointX: number, pointY: number}): void {
+  public appear(param: { pointX: number, pointY: number, zIndex?: number}): void {
     if (param.pointY) {
       canvas.style.top = param.pointY + 'px';
     }
     if (param.pointX) {
       canvas.style.left = param.pointX + 'px';
+    }
+    if (param.zIndex) {
+      canvas.style.zIndex = param.zIndex.toString();
     }
 
     this._modelClear = false;
