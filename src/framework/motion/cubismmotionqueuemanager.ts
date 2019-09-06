@@ -110,7 +110,7 @@ export namespace Live2DCubismFramework {
             let now = new Date().getTime()
             if (now - timeCount >= 30000) {
               this._currentPriority = 0;
-              reject('动画执行超时(30s)')
+              reject(new Error('动画执行超时(30s)'));
             }
           }
         }, 20);

@@ -318,7 +318,7 @@ export class LAppModel extends CubismUserModel {
         LAppPal.printLog('[APP]can\'t start motion.');
       }
       return new Promise<CubismUserModel>((reslove, reject) => {
-        reject('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue);
+        reject(new Error('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue));
       });
     }
 
@@ -367,7 +367,7 @@ export class LAppModel extends CubismUserModel {
     }
     if (motion == null) {
       return new Promise<CubismUserModel>((reslove, reject) => {
-        reject('没有可执行的motion');
+        reject(new Error('没有可执行的motion'));
       });
     }
     return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
