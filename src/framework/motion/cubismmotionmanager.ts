@@ -22,9 +22,6 @@ export namespace Live2DCubismFramework {
    * 管理动作的类
    */
   export class CubismMotionManager extends CubismMotionQueueManager {
-
-    public _currentPriority: number;   // 当前播放动作的优先级
-    public _reservePriority: number;   // 要播放的动议的优先级。 播放期间变为0。 在单独的线程中加载运动文件时的功能。
     /**
      * 构造函数
      */

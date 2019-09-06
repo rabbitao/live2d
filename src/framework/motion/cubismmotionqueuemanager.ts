@@ -35,6 +35,8 @@ export namespace Live2DCubismFramework {
     public _motions: csmVector<CubismMotionQueueEntry>; // 运动
     public _eventCallBack: CubismMotionEventFunction; // 回调函数
     public _eventCustomData: any; // 数据返回回调
+    public _currentPriority: number;   // 当前播放动作的优先级
+    public _reservePriority: number;   // 要播放的动议的优先级。 播放期间变为0。 在单独的线程中加载运动文件时的功能。
     /**
      * 构造函数
      */
@@ -71,7 +73,7 @@ export namespace Live2DCubismFramework {
      * @return  返回usermodel对象
      */
     public startMotion(motion: ACubismMotion, autoDelete: boolean, userTimeSeconds: number, model: CubismUserModel, callback?: () => void): Promise<CubismUserModel> {
-      return new Promise<CubismUserModel>((resolve) => {
+      return new Promise<CubismUserModel>((resolve, reject) => {
         if (motion == null) {
           return model;
         }
@@ -93,16 +95,23 @@ export namespace Live2DCubismFramework {
         motionQueueEntry._motion = motion;
 
         this._motions.pushBack(motionQueueEntry);
-        let time: number | null = 0;
-        time = window.setInterval(() => {
+        let timer: number | null = 0;
+        let timeCount: number = new Date().getTime()
+        timer = window.setInterval(() => {
           if (this.isFinished()) {
-            clearInterval(time as number);
-            time = null;
+            window.clearInterval(timer as number);
+            timer = null;
             if (Object.prototype.toString.call(callback) === '[object Function]') {
               (callback as (() => void))();
             }
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
             resolve(model);
+          } else {
+            let now = new Date().getTime()
+            if (now - timeCount >= 30000) {
+              this._currentPriority = 0;
+              reject('动画执行超时(30s)')
+            }
           }
         }, 20);
       });
