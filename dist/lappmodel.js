@@ -257,7 +257,9 @@ var LAppModel = /** @class */ (function (_super) {
             if (this._debugMode) {
                 LAppPal.printLog('[APP]can\'t start motion.');
             }
-            return InvalidMotionQueueEntryHandleValue;
+            return new Promise(function (reslove, reject) {
+                reject(new Error('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue));
+            });
         }
         var fileName = this._modelSetting.getMotionFileName(motionParams.groupName, motionParams.no);
         // ex) idle_0
@@ -273,11 +275,11 @@ var LAppModel = /** @class */ (function (_super) {
                 var buffer = arrayBuffer;
                 var size = buffer.byteLength;
                 motion = _this.loadMotion(buffer, size, null);
-                var fadeTime = _this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
+                var fadeTime = motionParams.fadeInTime || _this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
                 if (fadeTime >= 0.0) {
                     motion.setFadeInTime(fadeTime);
                 }
-                fadeTime = _this._modelSetting.getMotionFadeOutTimeValue(motionParams.groupName, motionParams.no);
+                fadeTime = motionParams.fadeOutTime || _this._modelSetting.getMotionFadeOutTimeValue(motionParams.groupName, motionParams.no);
                 if (fadeTime >= 0.0) {
                     motion.setFadeOutTime(fadeTime);
                 }
@@ -291,7 +293,7 @@ var LAppModel = /** @class */ (function (_super) {
         }
         if (motion == null) {
             return new Promise(function (reslove, reject) {
-                reject('没有可执行的motion');
+                reject(new Error('没有可执行的motion'));
             });
         }
         return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
@@ -499,6 +501,9 @@ var LAppModel = /** @class */ (function (_super) {
         }
         if (param.pointX) {
             canvas.style.left = param.pointX + 'px';
+        }
+        if (param.zIndex) {
+            canvas.style.zIndex = param.zIndex.toString();
         }
         this._modelClear = false;
     };

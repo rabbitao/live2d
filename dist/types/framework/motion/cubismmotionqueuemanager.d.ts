@@ -25,6 +25,8 @@ export declare namespace Live2DCubismFramework {
         _motions: csmVector<CubismMotionQueueEntry>;
         _eventCallBack: CubismMotionEventFunction;
         _eventCustomData: any;
+        _currentPriority: number;
+        _reservePriority: number;
         /**
          * 构造函数
          */

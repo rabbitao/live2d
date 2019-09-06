@@ -145,6 +145,7 @@ export declare class LAppModel extends CubismUserModel {
     appear(param: {
         pointX: number;
         pointY: number;
+        zIndex?: number;
     }): void;
     /**
      * 隐藏模型。

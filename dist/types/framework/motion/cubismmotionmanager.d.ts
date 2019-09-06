@@ -13,8 +13,6 @@ export declare namespace Live2DCubismFramework {
      * 管理动作的类
      */
     class CubismMotionManager extends CubismMotionQueueManager {
-        _currentPriority: number;
-        _reservePriority: number;
         /**
          * 构造函数
          */

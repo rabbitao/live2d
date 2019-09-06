@@ -54,7 +54,7 @@ export var Live2DCubismFramework;
          */
         CubismMotionQueueManager.prototype.startMotion = function (motion, autoDelete, userTimeSeconds, model, callback) {
             var _this = this;
-            return new Promise(function (resolve) {
+            return new Promise(function (resolve, reject) {
                 if (motion == null) {
                     return model;
                 }
@@ -71,16 +71,24 @@ export var Live2DCubismFramework;
                 motionQueueEntry._autoDelete = autoDelete;
                 motionQueueEntry._motion = motion;
                 _this._motions.pushBack(motionQueueEntry);
-                var time = 0;
-                time = window.setInterval(function () {
+                var timer = 0;
+                var timeCount = new Date().getTime();
+                timer = window.setInterval(function () {
                     if (_this.isFinished()) {
-                        clearInterval(time);
-                        time = null;
+                        window.clearInterval(timer);
+                        timer = null;
                         if (Object.prototype.toString.call(callback) === '[object Function]') {
                             callback();
                         }
                         // resolve(motionQueueEntry._motionQueueEntryHandle, model);
                         resolve(model);
+                    }
+                    else {
+                        var now = new Date().getTime();
+                        if (now - timeCount >= 30000) {
+                            _this._currentPriority = 0;
+                            reject(new Error('动画执行超时(30s)'));
+                        }
                     }
                 }, 20);
             });
