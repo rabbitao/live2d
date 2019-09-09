@@ -130,7 +130,7 @@ export class LAppDelegate {
       /**
       * 触摸时调用。
       */
-      canvas.ontouchstart = (e: TouchEvent) => {
+      canvas.addEventListener('touchstart', (e: TouchEvent) => {
         if (!this._view) {
           LAppPal.printLog('view notfound');
           return;
@@ -142,11 +142,11 @@ export class LAppDelegate {
         const posY = e.changedTouches[0].pageY;
 
         this._view.onTouchesBegan(posX, posY);
-      };
+      });
       /*
       * 触摸移动时调用。
       */
-      canvas.ontouchmove = (e: TouchEvent) => {
+      canvas.addEventListener('touchmove', (e: TouchEvent) => {
         if (!this._captured) {
           return;
         }
@@ -162,11 +162,11 @@ export class LAppDelegate {
         const posY = e.changedTouches[0].clientY - rect.top;
 
         this._view.onTouchesMoved(posX, posY);
-      };
+      });
     /*
     * 触摸完成时调用。
     */
-      canvas.ontouchend = (e: TouchEvent) => {
+      canvas.addEventListener('touchend', (e: TouchEvent) => {
         this._captured = false;
 
         if (!this._view) {
@@ -180,11 +180,11 @@ export class LAppDelegate {
         const posY = e.changedTouches[0].clientY - rect.top;
 
         this._view.onTouchesEnded(posX, posY);
-      };
+      });
     /*
-  * 取消触摸。
-  */
-      canvas.ontouchcancel = (e: TouchEvent) => {
+    * 取消触摸。
+    */
+      canvas.addEventListener('touchcancel', (e: TouchEvent) => {
         this._captured = false;
 
         if (!this._view) {
@@ -198,10 +198,10 @@ export class LAppDelegate {
         const posY = e.changedTouches[0].clientY - rect.top;
 
         this._view.onTouchesEnded(posX, posY);
-      };
+      });
     } else {
       // 注册鼠标相关的回调函数
-      canvas.onmousedown = (e: MouseEvent) => {
+      canvas.addEventListener('mousedown', (e: MouseEvent) => {
         if (!this._view) {
           LAppPal.printLog('view notfound');
           return;
@@ -211,8 +211,8 @@ export class LAppDelegate {
         const posX: number = e.pageX;
         const posY: number = e.pageY;
         this._view.onTouchesBegan(posX, posY);
-      };
-      canvas.onmousemove = (e: MouseEvent) => {
+      });
+      canvas.addEventListener('mousemove', (e: MouseEvent) => {
         if (!this._captured) {
           return;
         }
@@ -226,8 +226,8 @@ export class LAppDelegate {
         const posX: number = e.clientX - rect.left;
         const posY: number = e.clientY - rect.top;
         this._view.onTouchesMoved(posX, posY);
-      };
-      canvas.onmouseup = (e: MouseEvent) => {
+      });
+      canvas.addEventListener('mouseup', (e: MouseEvent) => {
         this._captured = false;
         if (!this._view) {
           LAppPal.printLog('view notfound');
@@ -240,7 +240,7 @@ export class LAppDelegate {
         const posY: number = e.clientY - rect.top;
 
         this._view.onTouchesEnded(posX, posY);
-      };
+      });
     }
 
     // AppView初始化

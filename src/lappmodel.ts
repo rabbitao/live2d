@@ -597,13 +597,13 @@ export class LAppModel extends CubismUserModel {
    * @Param {pointX: number, pointY: number} 出现的坐标
    */
   public appear(param: { pointX: number, pointY: number, zIndex?: number}): void {
-    if (param.pointY) {
+    if (param && param.pointY) {
       canvas.style.top = param.pointY + 'px';
     }
-    if (param.pointX) {
+    if (param && param.pointX) {
       canvas.style.left = param.pointX + 'px';
     }
-    if (param.zIndex) {
+    if (param && param.zIndex) {
       canvas.style.zIndex = param.zIndex.toString();
     }
 
