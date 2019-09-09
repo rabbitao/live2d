@@ -308,7 +308,7 @@ export class LAppModel extends CubismUserModel {
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
   public startMotion(motionParams: CubismMotionParam = {groupName: '', no: 0, priority: 2}): Promise<CubismUserModel> {
-    // this._modelClear = false;
+    this._modelClear = false;
     motionParams.no = motionParams.no || 0;
     motionParams.priority = motionParams.priority || 2;
     if (motionParams.priority == LAppDefine.PriorityForce) {

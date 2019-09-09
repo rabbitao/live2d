@@ -44,6 +44,8 @@ export namespace Live2DCubismFramework {
       this._userTimeSeconds = 0.0;
       this._eventCallBack = null as any;
       this._eventCustomData = null;
+      this._currentPriority = 0;
+      this._reservePriority = 0;
       this._motions = new csmVector<CubismMotionQueueEntry>();
     }
 
@@ -96,7 +98,7 @@ export namespace Live2DCubismFramework {
 
         this._motions.pushBack(motionQueueEntry);
         let timer: number | null = 0;
-        let timeCount: number = new Date().getTime()
+        let timeCount: number = new Date().getTime();
         timer = window.setInterval(() => {
           if (this.isFinished()) {
             window.clearInterval(timer as number);
@@ -107,7 +109,7 @@ export namespace Live2DCubismFramework {
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
             resolve(model);
           } else {
-            let now = new Date().getTime()
+            let now = new Date().getTime();
             if (now - timeCount >= 30000) {
               this._currentPriority = 0;
               reject(new Error('动画执行超时(30s)'));

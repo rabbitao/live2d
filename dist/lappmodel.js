@@ -247,7 +247,7 @@ var LAppModel = /** @class */ (function (_super) {
     LAppModel.prototype.startMotion = function (motionParams) {
         var _this = this;
         if (motionParams === void 0) { motionParams = { groupName: '', no: 0, priority: 2 }; }
-        // this._modelClear = false;
+        this._modelClear = false;
         motionParams.no = motionParams.no || 0;
         motionParams.priority = motionParams.priority || 2;
         if (motionParams.priority == LAppDefine.PriorityForce) {

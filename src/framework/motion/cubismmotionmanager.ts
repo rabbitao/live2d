@@ -27,8 +27,6 @@ export namespace Live2DCubismFramework {
      */
     public constructor() {
       super();
-      this._currentPriority = 0;
-      this._reservePriority = 0;
     }
 
     /**

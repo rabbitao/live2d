@@ -27,6 +27,8 @@ export var Live2DCubismFramework;
             this._userTimeSeconds = 0.0;
             this._eventCallBack = null;
             this._eventCustomData = null;
+            this._currentPriority = 0;
+            this._reservePriority = 0;
             this._motions = new csmVector();
         }
         /**

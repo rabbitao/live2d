@@ -32,10 +32,7 @@ export var Live2DCubismFramework;
          * 构造函数
          */
         function CubismMotionManager() {
-            var _this = _super.call(this) || this;
-            _this._currentPriority = 0;
-            _this._reservePriority = 0;
-            return _this;
+            return _super.call(this) || this;
         }
         /**
          * 在播放期间获得动作优先级
