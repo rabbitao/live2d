@@ -686,6 +686,10 @@ export class LAppModel extends CubismUserModel {
     this.startMotion(this._motionQueue[0]).then(() => {
       this._motionQueue.shift();
       this.executeMotionQueue();
+    }).catch(e => {
+      console.error('[APP]当前动作无效.', this._motionQueue[0], e);
+      this._motionQueue.shift();
+      this.executeMotionQueue();
     });
   }
 
