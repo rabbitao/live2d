@@ -496,13 +496,13 @@ var LAppModel = /** @class */ (function (_super) {
      * @Param {pointX: number, pointY: number} 出现的坐标
      */
     LAppModel.prototype.appear = function (param) {
-        if (param.pointY) {
+        if (param && param.pointY) {
             canvas.style.top = param.pointY + 'px';
         }
-        if (param.pointX) {
+        if (param && param.pointX) {
             canvas.style.left = param.pointX + 'px';
         }
-        if (param.zIndex) {
+        if (param && param.zIndex) {
             canvas.style.zIndex = param.zIndex.toString();
         }
         this._modelClear = false;
@@ -573,6 +573,10 @@ var LAppModel = /** @class */ (function (_super) {
             return;
         }
         this.startMotion(this._motionQueue[0]).then(function () {
+            _this._motionQueue.shift();
+            _this.executeMotionQueue();
+        }).catch(function (e) {
+            console.error('[APP]当前动作无效.', _this._motionQueue[0], e);
             _this._motionQueue.shift();
             _this.executeMotionQueue();
         });

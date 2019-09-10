@@ -107,7 +107,7 @@ var LAppDelegate = /** @class */ (function () {
             /**
             * 触摸时调用。
             */
-            canvas.ontouchstart = function (e) {
+            canvas.addEventListener('touchstart', function (e) {
                 if (!_this._view) {
                     LAppPal.printLog('view notfound');
                     return;
@@ -116,11 +116,11 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.changedTouches[0].pageX;
                 var posY = e.changedTouches[0].pageY;
                 _this._view.onTouchesBegan(posX, posY);
-            };
+            });
             /*
             * 触摸移动时调用。
             */
-            canvas.ontouchmove = function (e) {
+            canvas.addEventListener('touchmove', function (e) {
                 if (!_this._captured) {
                     return;
                 }
@@ -132,11 +132,11 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.changedTouches[0].clientX - rect.left;
                 var posY = e.changedTouches[0].clientY - rect.top;
                 _this._view.onTouchesMoved(posX, posY);
-            };
+            });
             /*
             * 触摸完成时调用。
             */
-            canvas.ontouchend = function (e) {
+            canvas.addEventListener('touchend', function (e) {
                 _this._captured = false;
                 if (!_this._view) {
                     LAppPal.printLog('view notfound');
@@ -146,11 +146,11 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.changedTouches[0].clientX - rect.left;
                 var posY = e.changedTouches[0].clientY - rect.top;
                 _this._view.onTouchesEnded(posX, posY);
-            };
+            });
             /*
-          * 取消触摸。
-          */
-            canvas.ontouchcancel = function (e) {
+            * 取消触摸。
+            */
+            canvas.addEventListener('touchcancel', function (e) {
                 _this._captured = false;
                 if (!_this._view) {
                     LAppPal.printLog('view notfound');
@@ -160,11 +160,11 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.changedTouches[0].clientX - rect.left;
                 var posY = e.changedTouches[0].clientY - rect.top;
                 _this._view.onTouchesEnded(posX, posY);
-            };
+            });
         }
         else {
             // 注册鼠标相关的回调函数
-            canvas.onmousedown = function (e) {
+            canvas.addEventListener('mousedown', function (e) {
                 if (!_this._view) {
                     LAppPal.printLog('view notfound');
                     return;
@@ -173,8 +173,8 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.pageX;
                 var posY = e.pageY;
                 _this._view.onTouchesBegan(posX, posY);
-            };
-            canvas.onmousemove = function (e) {
+            });
+            canvas.addEventListener('mousemove', function (e) {
                 if (!_this._captured) {
                     return;
                 }
@@ -186,8 +186,8 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.clientX - rect.left;
                 var posY = e.clientY - rect.top;
                 _this._view.onTouchesMoved(posX, posY);
-            };
-            canvas.onmouseup = function (e) {
+            });
+            canvas.addEventListener('mouseup', function (e) {
                 _this._captured = false;
                 if (!_this._view) {
                     LAppPal.printLog('view notfound');
@@ -197,7 +197,7 @@ var LAppDelegate = /** @class */ (function () {
                 var posX = e.clientX - rect.left;
                 var posY = e.clientY - rect.top;
                 _this._view.onTouchesEnded(posX, posY);
-            };
+            });
         }
         // AppView初始化
         this._view.initialize();
