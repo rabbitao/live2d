@@ -11,7 +11,8 @@ import live2d from 'find-live2d3'
 /** 初始化live2d
  * @param object: {canvasId: string, width: number, height:number} 画布的id及大小
  */
-const live2dmanager = live2d.initialize({canvasId: string, width: number, height:number})
+let live2dInstance = new live2D()
+const live2dmanager = live2dInstance.initialize({canvasId: string, width: number, height:number})
 ```
 
 ``` javascript

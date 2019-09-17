@@ -405,7 +405,7 @@ export class LAppModel extends CubismUserModel {
       timer = window.setInterval(() => {
         if (this._motionQueue.length === 0) {
           resolve(this);
-          clearInterval(timer as number);
+          window.clearInterval(timer as number);
           timer = null;
         }
       }, 50);
