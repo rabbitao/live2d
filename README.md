@@ -52,14 +52,13 @@ public void disappear()
  * @param object: { groupName: 动作组名称
  *                  no: 动作索引. 当前动作组内如果有多个动画, 执行索引指定的那个. 默认为0
  *                  priority: 动画权重(默认2).
- *                  autoIdle: 执行完当前是否自动执行idle动画. 默认自动执行. 不执行则进行呼吸动作或停在动画最后一帧
  *                  fadeInTime: 淡入时间, 默认读model3.json配置表
  *                  fadeOutTime: 淡出时间, 默认读model3.json配置表
  *                  callback: 当前动作执行完毕后触发
  *                }
  * @return Promise<Model>
  */
-public Promise startMotion({groupName: string, no?: number, priority?: number, autoIdle?:boolean, fadeInTime?: number, fadeOutTime?: number, callback?: () => void})
+public Promise startMotion({groupName: string, no?: number, priority?: number, fadeInTime?: number, fadeOutTime?: number, callback?: () => void})
 ```
 
 ``` javascript
