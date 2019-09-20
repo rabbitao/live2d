@@ -50,7 +50,6 @@ export declare class LAppModel extends CubismUserModel {
         modelName: string;
     };
     _mouseOpen: boolean;
-    _autoIdle: boolean;
     /**
      * 构造函数
      */

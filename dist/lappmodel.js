@@ -111,7 +111,6 @@ var LAppModel = /** @class */ (function (_super) {
         _this._motionCount = 0;
         _this._allMotionCount = 0;
         _this._mouseOpen = false;
-        _this._autoIdle = true;
         _this._modelTextures = [];
         return _this;
     }
@@ -168,7 +167,7 @@ var LAppModel = /** @class */ (function (_super) {
         var motionUpdated = false;
         // --------------------------------------------------------------------------
         this._model.loadParameters(); // 加载上次保存的状态
-        if (this._motionManager.isFinished() && this._autoIdle) {
+        if (this._motionManager.isFinished()) {
             // 如果没有动作播放，则从待机动作中随机播放
             this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
         }
@@ -251,9 +250,6 @@ var LAppModel = /** @class */ (function (_super) {
         this._modelClear = false;
         motionParams.no = motionParams.no || 0;
         motionParams.priority = motionParams.priority || 2;
-        if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
-            this._autoIdle = motionParams.autoIdle;
-        }
         if (motionParams.priority == LAppDefine.PriorityForce) {
             this._motionManager.setReservePriority(motionParams.priority);
         }
@@ -298,6 +294,12 @@ var LAppModel = /** @class */ (function (_super) {
         if (motion == null) {
             return new Promise(function (reslove, reject) {
                 reject(new Error('没有可执行的motion'));
+            });
+        }
+        if (motionParams.groupName === 'Idle') {
+            this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
+            return new Promise(function (reslove) {
+                reslove();
             });
         }
         return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);

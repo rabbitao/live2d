@@ -283,7 +283,7 @@ export class LAppDelegate {
       LAppPal.updateTime();
 
       // 屏幕初始化
-      gl.clearColor(1, 1, 1, 0);
+      gl.clearColor(0, 0, 0, 0);
 
       // 启用深度测试
       gl.enable(gl.DEPTH_TEST);

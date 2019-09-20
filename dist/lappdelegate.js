@@ -232,7 +232,7 @@ var LAppDelegate = /** @class */ (function () {
             // 时间更新
             LAppPal.updateTime();
             // 屏幕初始化
-            gl.clearColor(1, 1, 1, 0);
+            gl.clearColor(0, 0, 0, 0);
             // 启用深度测试
             gl.enable(gl.DEPTH_TEST);
             // 附近的物体遮挡了远处的物体
