@@ -120,7 +120,6 @@ export class LAppModel extends CubismUserModel {
   public _allMotionCount: number; // 动作总数
   public _modelResource: { path: string, modelName: string }; // 模型资源
   public _mouseOpen: boolean; // 是否张嘴
-  public _autoIdle: boolean; // 是否自动执行idle
 
 
   /**
@@ -155,7 +154,6 @@ export class LAppModel extends CubismUserModel {
     this._motionCount = 0;
     this._allMotionCount = 0;
     this._mouseOpen = false;
-    this._autoIdle = true;
     this._modelTextures = [];
   }
   /**
@@ -221,7 +219,7 @@ export class LAppModel extends CubismUserModel {
 
     // --------------------------------------------------------------------------
     this._model.loadParameters();   // 加载上次保存的状态
-    if (this._motionManager.isFinished() && this._autoIdle) {
+    if (this._motionManager.isFinished()) {
       // 如果没有动作播放，则从待机动作中随机播放
       this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
 
@@ -313,9 +311,6 @@ export class LAppModel extends CubismUserModel {
     this._modelClear = false;
     motionParams.no = motionParams.no || 0;
     motionParams.priority = motionParams.priority || 2;
-    if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
-      this._autoIdle = motionParams.autoIdle;
-    }
     if (motionParams.priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(motionParams.priority);
     } else if (!this._motionManager.reserveMotion(motionParams.priority)) {
@@ -373,6 +368,12 @@ export class LAppModel extends CubismUserModel {
     if (motion == null) {
       return new Promise<CubismUserModel>((reslove, reject) => {
         reject(new Error('没有可执行的motion'));
+      });
+    }
+    if (motionParams.groupName === 'Idle') {
+      this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
+      return new Promise<CubismUserModel>((reslove) => {
+        reslove();
       });
     }
     return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);

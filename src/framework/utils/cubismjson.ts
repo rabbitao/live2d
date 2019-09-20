@@ -320,7 +320,6 @@ export namespace Live2DCubismFramework {
       const endPos: number[] = new Array(1); // 要通过引用传递的数组
       const decodeBuffer: string = this.arrayBufferToString(buffer);
       this._root = this.parseValue(decodeBuffer, size, 0, endPos) as any;
-
       if (this._error) {
         let strbuf: string = '\0';
         strbuf = 'Json parse error : @line ' + (this._lineCount + 1) + '\n';

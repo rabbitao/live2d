@@ -299,7 +299,6 @@ export namespace Live2DCubismFramework {
       if (!this.isExistMotionGroupName(groupName)) {
         return 0;
       }
-
       return this._jsonValue.at(FrequestNode.FrequestNode_Motions).getValueByString(groupName).getSize();
     }
 
