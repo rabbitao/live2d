@@ -1,25 +1,21 @@
 {
   "name": "find-live2d3",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "private": false,
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "author": "rabbitao",
   "license": "MIT",
   "scripts": {
-    "test": "jest",
     "lint": "tslint --fix src/**/*.ts src/**/*.tsx",
     "tsc": "tsc",
     "types": "tsc -d --emitDeclarationOnly --allowJs false --declarationDir ./dist/types/",
     "build": "npm run tsc && npm run types"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.1",
     "@types/node": "^10.5.5",
     "clean-webpack-plugin": "^1.0.1",
-    "jest": "^23.4.2",
     "prettier": "^1.16.4",
-    "ts-jest": "^23.0.1",
     "ts-lint": "^4.5.1",
     "ts-loader": "^5.3.3",
     "tslint": "^5.11.0",

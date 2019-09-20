@@ -9,5 +9,4 @@ declare class live2d {
     }): LAppLive2DManager | null;
     release(): void;
 }
-declare const _default: live2d;
-export default _default;
+export default live2d;

@@ -5,6 +5,7 @@ export namespace Live2DCubismFramework {
     priority: number;
     fadeInTime?: number;
     fadeOutTime?: number;
+    autoIdle?: boolean;
     callback?: () => void;
   }
 }

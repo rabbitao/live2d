@@ -22,4 +22,4 @@ var live2d = /** @class */ (function () {
     };
     return live2d;
 }());
-export default new live2d();
+export default live2d;

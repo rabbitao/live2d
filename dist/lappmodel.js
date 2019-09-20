@@ -111,6 +111,7 @@ var LAppModel = /** @class */ (function (_super) {
         _this._motionCount = 0;
         _this._allMotionCount = 0;
         _this._mouseOpen = false;
+        _this._autoIdle = true;
         _this._modelTextures = [];
         return _this;
     }
@@ -167,7 +168,7 @@ var LAppModel = /** @class */ (function (_super) {
         var motionUpdated = false;
         // --------------------------------------------------------------------------
         this._model.loadParameters(); // 加载上次保存的状态
-        if (this._motionManager.isFinished()) {
+        if (this._motionManager.isFinished() && this._autoIdle) {
             // 如果没有动作播放，则从待机动作中随机播放
             this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
         }
@@ -250,6 +251,9 @@ var LAppModel = /** @class */ (function (_super) {
         this._modelClear = false;
         motionParams.no = motionParams.no || 0;
         motionParams.priority = motionParams.priority || 2;
+        if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
+            this._autoIdle = motionParams.autoIdle;
+        }
         if (motionParams.priority == LAppDefine.PriorityForce) {
             this._motionManager.setReservePriority(motionParams.priority);
         }
@@ -331,7 +335,7 @@ var LAppModel = /** @class */ (function (_super) {
             timer = window.setInterval(function () {
                 if (_this._motionQueue.length === 0) {
                     resolve(_this);
-                    clearInterval(timer);
+                    window.clearInterval(timer);
                     timer = null;
                 }
             }, 50);

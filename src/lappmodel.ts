@@ -120,6 +120,7 @@ export class LAppModel extends CubismUserModel {
   public _allMotionCount: number; // 动作总数
   public _modelResource: { path: string, modelName: string }; // 模型资源
   public _mouseOpen: boolean; // 是否张嘴
+  public _autoIdle: boolean; // 是否自动执行idle
 
 
   /**
@@ -154,6 +155,7 @@ export class LAppModel extends CubismUserModel {
     this._motionCount = 0;
     this._allMotionCount = 0;
     this._mouseOpen = false;
+    this._autoIdle = true;
     this._modelTextures = [];
   }
   /**
@@ -219,7 +221,7 @@ export class LAppModel extends CubismUserModel {
 
     // --------------------------------------------------------------------------
     this._model.loadParameters();   // 加载上次保存的状态
-    if (this._motionManager.isFinished()) {
+    if (this._motionManager.isFinished() && this._autoIdle) {
       // 如果没有动作播放，则从待机动作中随机播放
       this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
 
@@ -307,10 +309,13 @@ export class LAppModel extends CubismUserModel {
    * @param priority 优先级
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
-  public startMotion(motionParams: CubismMotionParam = {groupName: '', no: 0, priority: 2}): Promise<CubismUserModel> {
+  public startMotion(motionParams: CubismMotionParam = { groupName: '', no: 0, priority: 2}): Promise<CubismUserModel> {
     this._modelClear = false;
     motionParams.no = motionParams.no || 0;
     motionParams.priority = motionParams.priority || 2;
+    if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
+      this._autoIdle = motionParams.autoIdle;
+    }
     if (motionParams.priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(motionParams.priority);
     } else if (!this._motionManager.reserveMotion(motionParams.priority)) {
