@@ -352,6 +352,7 @@ var LAppModel = /** @class */ (function (_super) {
      */
     LAppModel.prototype.stopAllMotions = function (clear) {
         this._motionQueue = [];
+        this._mouthOpen = false;
         this._motionManager.stopAllMotions();
         if (clear) {
             this.clear();
@@ -360,10 +361,13 @@ var LAppModel = /** @class */ (function (_super) {
     /**
     * 更改idle动作的名称.
     */
-    LAppModel.prototype.replaceIdleMotion = function (groupName) {
+    LAppModel.prototype.replaceIdleMotion = function (groupName, execImmediately) {
+        if (execImmediately === void 0) { execImmediately = true; }
         this._motionManager.stopAllMotions();
         this._motionIdleName = groupName;
-        this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+        if (execImmediately) {
+            this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+        }
     };
     /**
     * 嘴巴进行说话动作.

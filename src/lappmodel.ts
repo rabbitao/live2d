@@ -439,10 +439,12 @@ export class LAppModel extends CubismUserModel {
   /**
   * 更改idle动作的名称.
   */
-  public replaceIdleMotion(groupName: string) {
+  public replaceIdleMotion(groupName: string, execImmediately: boolean = true) {
     this._motionManager.stopAllMotions();
     this._motionIdleName = groupName;
-    this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+    if (execImmediately) {
+      this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+    }
   }
 
   /**

@@ -89,8 +89,9 @@ public void stopAllMotions(clear?: boolean)
 ``` javascript
 /** 用指定的动画组替换默认发呆的动画组. 该动画自动循环
  * @param groupName: 动画组名称
+ * @param execImmediately: 是否立即执行该动画 default: true
  */
-public void replaceIdleMotion(groupName: string)
+public void replaceIdleMotion(groupName: string, execImmediately: boolean)
 ```
 
 ``` javascript

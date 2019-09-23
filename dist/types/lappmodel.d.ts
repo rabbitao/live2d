@@ -102,7 +102,7 @@ export declare class LAppModel extends CubismUserModel {
     /**
     * 更改idle动作的名称.
     */
-    replaceIdleMotion(groupName: string): void;
+    replaceIdleMotion(groupName: string, execImmediately?: boolean): void;
     /**
     * 嘴巴进行说话动作.
     */
