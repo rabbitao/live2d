@@ -115,9 +115,8 @@ public void clear()
 ```
 
 ``` javascript
-/** 
- *  张嘴
- *  @Param speed 嘴巴动态速度. 1为最快. 默认为3
+/** 张嘴
+ * @param speed: 嘴巴动态速度. 1为最快. 默认为3
  */
 public void mouthOpen(speed: number)
 ```
