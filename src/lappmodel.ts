@@ -119,8 +119,11 @@ export class LAppModel extends CubismUserModel {
   public _motionCount: number;   // 动作数据计数
   public _allMotionCount: number; // 动作总数
   public _modelResource: { path: string, modelName: string }; // 模型资源
-  public _mouseOpen: boolean; // 是否张嘴
-
+  public _mouthOpen: boolean; // 是否张嘴
+  public _mouthSpeed: number; // 嘴巴速度
+  public _mouthSpeedCal: number; // 用来计算速度的临时变量
+  public _mouthParamY: Array<number>; // 嘴巴动态数组
+  public _mouthOpenIndex: number; // 嘴巴动态数组索引
 
   /**
    * 构造函数
@@ -153,7 +156,11 @@ export class LAppModel extends CubismUserModel {
     this._textureCount = 0;
     this._motionCount = 0;
     this._allMotionCount = 0;
-    this._mouseOpen = false;
+    this._mouthSpeed = 3;
+    this._mouthSpeedCal = 3;
+    this._mouthOpen = false;
+    this._mouthOpenIndex = 0;
+    this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
     this._modelTextures = [];
   }
   /**
@@ -265,30 +272,28 @@ export class LAppModel extends CubismUserModel {
     }
 
     // 唇形同步设置
-    if (this._lipsync && this._mouseOpen) {
+    if (this._lipsync && this._mouthOpen) {
       // const value: number = 0;  // 当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
       // for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
       //   this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
       // }
-      let value: number = this._lastLipSyncValue;
-      let trend = this._lipsyncTrend;
-      for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
-        if (trend === 'increase') {
-          value = value + 0.05;
-          if (value >= 1) {
-            value = 1;
-            this._lipsyncTrend = 'reduce';
+      this._mouthSpeedCal -= 1;
+      if (this._mouthSpeedCal === 0) {
+        let value: number = 0;
+        for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
+          value = this._mouthParamY[this._mouthOpenIndex];
+          this._mouthOpenIndex += 1;
+          if (this._mouthOpenIndex >= 46) {
+            this._mouthOpenIndex = 0;
           }
-        } else {
-          value = value - 0.05;
-          if (value <= 0) {
-            value = 0;
-            this._lipsyncTrend = 'increase';
-          }
+          this._lastLipSyncValue = value
+          this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
         }
-
-        this._lastLipSyncValue = value;
-        this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
+        this._mouthSpeedCal = this._mouthSpeed;
+      } else {
+        for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
+          this._model.addParameterValueById(this._lipSyncIds.at(i), this._lastLipSyncValue, 1);
+        }
       }
     }
 
@@ -442,12 +447,16 @@ export class LAppModel extends CubismUserModel {
   /**
   * 嘴巴进行说话动作.
   */
-  public mouthOpen() {
-    this._mouseOpen = true;
+  public mouthOpen(speed) {
+    if (Object.prototype.toString.call(speed) === '[object Number]') {
+      speed = speed < 1 ? 1 : speed
+      this._mouthSpeed = speed;
+    }
+    this._mouthOpen = true;
   }
 
   public mouthClose() {
-    this._mouseOpen = false;
+    this._mouthOpen = false;
   }
 
   /**
