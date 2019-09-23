@@ -110,7 +110,11 @@ var LAppModel = /** @class */ (function (_super) {
         _this._textureCount = 0;
         _this._motionCount = 0;
         _this._allMotionCount = 0;
-        _this._mouseOpen = false;
+        _this._mouthSpeed = 3;
+        _this._mouthSpeedCal = 3;
+        _this._mouthOpen = false;
+        _this._mouthOpenIndex = 0;
+        _this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
         _this._modelTextures = [];
         return _this;
     }
@@ -205,30 +209,29 @@ var LAppModel = /** @class */ (function (_super) {
             this._physics.evaluate(this._model, deltaTimeSeconds);
         }
         // 唇形同步设置
-        if (this._lipsync && this._mouseOpen) {
+        if (this._lipsync && this._mouthOpen) {
             // const value: number = 0;  // 当实时执行唇形同步时，从系统获取音量并输入0到1之间的值
             // for (let i: number = 0; i < this._lipSyncIds.getSize(); ++i) {
             //   this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
             // }
-            var value = this._lastLipSyncValue;
-            var trend = this._lipsyncTrend;
-            for (var i = 0; i < this._lipSyncIds.getSize(); ++i) {
-                if (trend === 'increase') {
-                    value = value + 0.05;
-                    if (value >= 1) {
-                        value = 1;
-                        this._lipsyncTrend = 'reduce';
+            this._mouthSpeedCal -= 1;
+            if (this._mouthSpeedCal === 0) {
+                var value = 0;
+                for (var i = 0; i < this._lipSyncIds.getSize(); ++i) {
+                    value = this._mouthParamY[this._mouthOpenIndex];
+                    this._mouthOpenIndex += 1;
+                    if (this._mouthOpenIndex >= 46) {
+                        this._mouthOpenIndex = 0;
                     }
+                    this._lastLipSyncValue = value;
+                    this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
                 }
-                else {
-                    value = value - 0.05;
-                    if (value <= 0) {
-                        value = 0;
-                        this._lipsyncTrend = 'increase';
-                    }
+                this._mouthSpeedCal = this._mouthSpeed;
+            }
+            else {
+                for (var i = 0; i < this._lipSyncIds.getSize(); ++i) {
+                    this._model.addParameterValueById(this._lipSyncIds.at(i), this._lastLipSyncValue, 1);
                 }
-                this._lastLipSyncValue = value;
-                this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
             }
         }
         // 姿势设置
@@ -365,11 +368,15 @@ var LAppModel = /** @class */ (function (_super) {
     /**
     * 嘴巴进行说话动作.
     */
-    LAppModel.prototype.mouthOpen = function () {
-        this._mouseOpen = true;
+    LAppModel.prototype.mouthOpen = function (speed) {
+        if (Object.prototype.toString.call(speed) === '[object Number]') {
+            speed = speed < 1 ? 1 : speed;
+            this._mouthSpeed = speed;
+        }
+        this._mouthOpen = true;
     };
     LAppModel.prototype.mouthClose = function () {
-        this._mouseOpen = false;
+        this._mouthOpen = false;
     };
     /**
     * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布.

@@ -429,6 +429,7 @@ export class LAppModel extends CubismUserModel {
    */
   public stopAllMotions(clear: boolean) {
     this._motionQueue = [];
+    this._mouthOpen = false;
     this._motionManager.stopAllMotions();
     if (clear) {
       this.clear();

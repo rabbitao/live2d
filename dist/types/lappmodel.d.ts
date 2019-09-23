@@ -49,7 +49,11 @@ export declare class LAppModel extends CubismUserModel {
         path: string;
         modelName: string;
     };
-    _mouseOpen: boolean;
+    _mouthOpen: boolean;
+    _mouthSpeed: number;
+    _mouthSpeedCal: number;
+    _mouthParamY: Array<number>;
+    _mouthOpenIndex: number;
     /**
      * 构造函数
      */
@@ -102,7 +106,7 @@ export declare class LAppModel extends CubismUserModel {
     /**
     * 嘴巴进行说话动作.
     */
-    mouthOpen(): void;
+    mouthOpen(speed: any): void;
     mouthClose(): void;
     /**
     * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布.
