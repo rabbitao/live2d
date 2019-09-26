@@ -30,6 +30,9 @@ export class LAppPal {
           status: request.status,
           statusText: request.statusText
         }
+        if (!(new RegExp('^http:\/\/\\S+')).test(window.location.href) && options.status === 0) {
+          options.status = 200;
+        }
         let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText
         resolve(new Response(body, options))
       };

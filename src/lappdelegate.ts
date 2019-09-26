@@ -101,7 +101,7 @@ export class LAppDelegate {
       canvas.style.zIndex = '100';
       canvas.setAttribute('width', config.width.toString());
       canvas.setAttribute('height', config.height.toString());
-      document.getElementById('live2d-core-wrap').appendChild(canvas);
+      (document.getElementById('live2d-core-wrap') as HTMLDivElement).appendChild(canvas);
     }
 
     // 初始化gl上下文
