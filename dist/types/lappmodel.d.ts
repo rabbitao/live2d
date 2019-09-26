@@ -18,7 +18,6 @@ import CubismIdHandle = cubismid.CubismIdHandle;
 import CubismUserModel = cubismusermodel.CubismUserModel;
 import ICubismModelSetting = icubismmodelsetting.ICubismModelSetting;
 import CubismMotionParam = userMotionParam.CubismMotionParam;
-import 'whatwg-fetch';
 /**
  * 用户实际使用的模型的实现类<br>
  * 调用模型生成，功能组件生成，更新处理和呈现。
@@ -61,6 +60,7 @@ export declare class LAppModel extends CubismUserModel {
         path: string;
         modelName: string;
     });
+    private fetchFile;
     /**
      * model3.json从目录和文件路径生成模型
      * @param dir

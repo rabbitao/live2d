@@ -17,6 +17,29 @@ export class LAppPal {
   public static s_currentFrame = 0.0;
   public static s_lastFrame = 0.0;
   public static s_deltaTime = 0.0;
+
+  public static fetchFile(path: string, type?: XMLHttpRequestResponseType) {
+    return new Promise<Response>((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open('GET', path, true);
+      if (type) {
+        request.responseType = type;
+      }
+      request.onload = () => {
+        let options = {
+          status: request.status,
+          statusText: request.statusText
+        }
+        let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText
+        resolve(new Response(body, options))
+      };
+      request.onerror = function () {
+        reject(new TypeError('Local request failed'))
+      }
+      request.send();
+    });
+  }
+
   /**
    * 将文件作为字节数据读取
    *
@@ -32,7 +55,7 @@ export class LAppPal {
     const path: string = filePath;
 
     let size = 0;
-    fetch(path).then(
+    this.fetchFile(path, 'arraybuffer').then(
       (response) => {
         return response.arrayBuffer();
       },

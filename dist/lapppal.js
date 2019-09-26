@@ -12,6 +12,27 @@
 var LAppPal = /** @class */ (function () {
     function LAppPal() {
     }
+    LAppPal.fetchFile = function (path, type) {
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open('GET', path, true);
+            if (type) {
+                request.responseType = type;
+            }
+            request.onload = function () {
+                var options = {
+                    status: request.status,
+                    statusText: request.statusText
+                };
+                var body = 'response' in request ? request.response : request.responseText;
+                resolve(new Response(body, options));
+            };
+            request.onerror = function () {
+                reject(new TypeError('Local request failed'));
+            };
+            request.send();
+        });
+    };
     /**
      * 将文件作为字节数据读取
      *
@@ -26,7 +47,7 @@ var LAppPal = /** @class */ (function () {
         // filePath;//
         var path = filePath;
         var size = 0;
-        fetch(path).then(function (response) {
+        this.fetchFile(path, 'arraybuffer').then(function (response) {
             return response.arrayBuffer();
         }).then(function (arrayBuffer) {
             size = arrayBuffer.byteLength;

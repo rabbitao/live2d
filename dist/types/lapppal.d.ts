@@ -8,6 +8,7 @@ export declare class LAppPal {
     static s_currentFrame: number;
     static s_lastFrame: number;
     static s_deltaTime: number;
+    static fetchFile(path: string, type?: XMLHttpRequestResponseType): Promise<Response>;
     /**
      * 将文件作为字节数据读取
      *

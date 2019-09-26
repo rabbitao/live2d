@@ -44,7 +44,6 @@ var CubismDefaultParameterId = cubismdefaultparameterid;
 import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
 import { gl, canvas, frameBuffer, LAppDelegate } from './lappdelegate';
-import 'whatwg-fetch';
 function createBuffer(path, callBack) {
     LAppPal.loadFileAsBytes(path, callBack);
 }
@@ -118,6 +117,27 @@ var LAppModel = /** @class */ (function (_super) {
         _this._modelTextures = [];
         return _this;
     }
+    LAppModel.prototype.fetchFile = function (path, type) {
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open('GET', path, true);
+            if (type) {
+                request.responseType = type;
+            }
+            request.onload = function () {
+                var options = {
+                    status: request.status,
+                    statusText: request.statusText
+                };
+                var body = 'response' in request ? request.response : request.responseText;
+                resolve(new Response(body, options));
+            };
+            request.onerror = function () {
+                reject(new TypeError('Local request failed'));
+            };
+            request.send();
+        });
+    };
     /**
      * model3.json从目录和文件路径生成模型
      * @param dir
@@ -130,7 +150,7 @@ var LAppModel = /** @class */ (function (_super) {
             _this._modelName = modelName;
             _this._modelTextures = textures || [];
             var path = dir + fileName;
-            fetch(path).then(function (response) {
+            _this.fetchFile(path, 'arraybuffer').then(function (response) {
                 return response.arrayBuffer();
             }).then(function (arrayBuffer) {
                 var buffer = arrayBuffer;
@@ -272,7 +292,7 @@ var LAppModel = /** @class */ (function (_super) {
         if (motion == null) {
             var path_1 = fileName;
             path_1 = this._modelHomeDir + path_1;
-            fetch(path_1).then(function (response) {
+            this.fetchFile(path_1, 'arraybuffer').then(function (response) {
                 return response.arrayBuffer();
             }).then(function (arrayBuffer) {
                 var buffer = arrayBuffer;
@@ -363,6 +383,9 @@ var LAppModel = /** @class */ (function (_super) {
     */
     LAppModel.prototype.replaceIdleMotion = function (groupName, execImmediately) {
         if (execImmediately === void 0) { execImmediately = true; }
+        if (this._motionIdleName === groupName) {
+            return;
+        }
         this._motionManager.stopAllMotions();
         this._motionIdleName = groupName;
         if (execImmediately) {
@@ -470,7 +493,7 @@ var LAppModel = /** @class */ (function (_super) {
             if (this_1._debugMode) {
                 LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
             }
-            fetch(path).then(function (response) {
+            this_1.fetchFile(path, 'arraybuffer').then(function (response) {
                 return response.arrayBuffer();
             }).then(function (arrayBuffer) {
                 var buffer = arrayBuffer;
@@ -616,7 +639,7 @@ var LAppModel = /** @class */ (function (_super) {
             if (_this._modelSetting.getModelFileName() != '') {
                 var path_2 = _this._modelSetting.getModelFileName();
                 path_2 = _this._modelHomeDir + path_2;
-                fetch(path_2).then(function (response) {
+                _this.fetchFile(path_2, 'arraybuffer').then(function (response) {
                     return response.arrayBuffer();
                 }).then(function (arrayBuffer) {
                     buffer = arrayBuffer;
@@ -640,7 +663,7 @@ var LAppModel = /** @class */ (function (_super) {
                         var name_3 = _this._modelSetting.getExpressionName(i);
                         var path = _this._modelSetting.getExpressionFileName(i);
                         path = _this._modelHomeDir + path;
-                        fetch(path).then(function (response) {
+                        _this.fetchFile(path, 'arraybuffer').then(function (response) {
                             return response.arrayBuffer();
                         }).then(function (arrayBuffer) {
                             var buffer = arrayBuffer;
@@ -676,7 +699,7 @@ var LAppModel = /** @class */ (function (_super) {
                 if (_this._modelSetting.getPhysicsFileName() != '') {
                     var path_3 = _this._modelSetting.getPhysicsFileName();
                     path_3 = _this._modelHomeDir + path_3;
-                    fetch(path_3).then(function (response) {
+                    _this.fetchFile(path_3, 'arraybuffer').then(function (response) {
                         return response.arrayBuffer();
                     }).then(function (arrayBuffer) {
                         var buffer = arrayBuffer;
@@ -700,7 +723,7 @@ var LAppModel = /** @class */ (function (_super) {
                 if (_this._modelSetting.getPoseFileName() != '') {
                     var path_4 = _this._modelSetting.getPoseFileName();
                     path_4 = _this._modelHomeDir + path_4;
-                    fetch(path_4).then(function (response) {
+                    _this.fetchFile(path_4, 'arraybuffer').then(function (response) {
                         return response.arrayBuffer();
                     }).then(function (arrayBuffer) {
                         var buffer = arrayBuffer;
@@ -747,7 +770,7 @@ var LAppModel = /** @class */ (function (_super) {
                 if (_this._modelSetting.getUserDataFile() != '') {
                     var path_5 = _this._modelSetting.getUserDataFile();
                     path_5 = _this._modelHomeDir + path_5;
-                    fetch(path_5).then(function (response) {
+                    _this.fetchFile(path_5, 'arraybuffer').then(function (response) {
                         return response.arrayBuffer();
                     }).then(function (arrayBuffer) {
                         var buffer = arrayBuffer;

@@ -49,8 +49,6 @@ import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
 import { gl, canvas, frameBuffer, LAppDelegate } from './lappdelegate';
 import { TextureInfo } from './lapptexturemanager';
-import { LAppView } from './lappview';
-import 'whatwg-fetch';
 
 function createBuffer(path: string, callBack: any): void {
   LAppPal.loadFileAsBytes(path, callBack);
@@ -163,6 +161,29 @@ export class LAppModel extends CubismUserModel {
     this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
     this._modelTextures = [];
   }
+
+  private fetchFile(path: string, type?: XMLHttpRequestResponseType) {
+    return new Promise<Response>((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open('GET', path, true);
+      if (type) {
+        request.responseType = type;
+      }
+      request.onload = () => {
+        let options = {
+          status: request.status,
+          statusText: request.statusText
+        }
+        let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText
+        resolve(new Response(body, options))
+      };
+      request.onerror = function () {
+        reject(new TypeError('Local request failed'))
+      }
+      request.send();
+    });
+  }
+
   /**
    * model3.json从目录和文件路径生成模型
    * @param dir
@@ -174,7 +195,7 @@ export class LAppModel extends CubismUserModel {
       this._modelName = modelName;
       this._modelTextures = textures || [];
       const path: string = dir + fileName;
-      fetch(path).then(
+      this.fetchFile(path, 'arraybuffer').then(
         (response) => {
           return response.arrayBuffer();
         },
@@ -338,7 +359,7 @@ export class LAppModel extends CubismUserModel {
       let path: string = fileName;
       path = this._modelHomeDir + path;
 
-      fetch(path).then(
+      this.fetchFile(path, 'arraybuffer').then(
         (response) => {
           return response.arrayBuffer();
         },
@@ -440,6 +461,9 @@ export class LAppModel extends CubismUserModel {
   * 更改idle动作的名称.
   */
   public replaceIdleMotion(groupName: string, execImmediately: boolean = true) {
+    if (this._motionIdleName === groupName) {
+      return
+    }
     this._motionManager.stopAllMotions();
     this._motionIdleName = groupName;
     if (execImmediately) {
@@ -561,7 +585,7 @@ export class LAppModel extends CubismUserModel {
         LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
       }
 
-      fetch(path).then(
+      this.fetchFile(path, 'arraybuffer').then(
         (response) => {
           return response.arrayBuffer();
         },
@@ -732,7 +756,7 @@ export class LAppModel extends CubismUserModel {
         let path: string = this._modelSetting.getModelFileName();
         path = this._modelHomeDir + path;
 
-        fetch(path).then(
+        this.fetchFile(path, 'arraybuffer').then(
           (response) => {
             return response.arrayBuffer();
           },
@@ -764,7 +788,7 @@ export class LAppModel extends CubismUserModel {
             let path: string = this._modelSetting.getExpressionFileName(i);
             path = this._modelHomeDir + path;
 
-            fetch(path).then(
+            this.fetchFile(path, 'arraybuffer').then(
               (response) => {
                 return response.arrayBuffer();
               },
@@ -810,7 +834,7 @@ export class LAppModel extends CubismUserModel {
           let path: string = this._modelSetting.getPhysicsFileName();
           path = this._modelHomeDir + path;
 
-          fetch(path).then(
+          this.fetchFile(path, 'arraybuffer').then(
             (response) => {
               return response.arrayBuffer();
             },
@@ -843,7 +867,7 @@ export class LAppModel extends CubismUserModel {
           let path: string = this._modelSetting.getPoseFileName();
           path = this._modelHomeDir + path;
 
-          fetch(path).then(
+          this.fetchFile(path, 'arraybuffer').then(
             (response) => {
               return response.arrayBuffer();
             },
@@ -906,7 +930,7 @@ export class LAppModel extends CubismUserModel {
           let path: string = this._modelSetting.getUserDataFile();
           path = this._modelHomeDir + path;
 
-          fetch(path).then(
+          this.fetchFile(path, 'arraybuffer').then(
             (response) => {
               return response.arrayBuffer();
             },
