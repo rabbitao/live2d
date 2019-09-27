@@ -115,32 +115,9 @@ var LAppModel = /** @class */ (function (_super) {
         _this._mouthOpenIndex = 0;
         _this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
         _this._modelTextures = [];
+        _this._autoIdle = true;
         return _this;
     }
-    LAppModel.prototype.fetchFile = function (path, type) {
-        return new Promise(function (resolve, reject) {
-            var request = new XMLHttpRequest();
-            request.open('GET', path, true);
-            if (type) {
-                request.responseType = type;
-            }
-            request.onload = function () {
-                var options = {
-                    status: request.status,
-                    statusText: request.statusText
-                };
-                if (!(new RegExp('^http:\/\/\\S+')).test(window.location.href) && options.status === 0) {
-                    options.status = 200;
-                }
-                var body = 'response' in request ? request.response : request.responseText;
-                resolve(new Response(body, options));
-            };
-            request.onerror = function () {
-                reject(new TypeError('Local request failed'));
-            };
-            request.send();
-        });
-    };
     /**
      * model3.json从目录和文件路径生成模型
      * @param dir
@@ -194,7 +171,7 @@ var LAppModel = /** @class */ (function (_super) {
         var motionUpdated = false;
         // --------------------------------------------------------------------------
         this._model.loadParameters(); // 加载上次保存的状态
-        if (this._motionManager.isFinished()) {
+        if (this._motionManager.isFinished() && this._autoIdle) {
             // 如果没有动作播放，则从待机动作中随机播放
             this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
         }
@@ -272,10 +249,13 @@ var LAppModel = /** @class */ (function (_super) {
      */
     LAppModel.prototype.startMotion = function (motionParams) {
         var _this = this;
-        if (motionParams === void 0) { motionParams = { groupName: '', no: 0, priority: 2 }; }
+        if (motionParams === void 0) { motionParams = { groupName: '', no: 0, priority: 2, autoIdle: true }; }
         this._modelClear = false;
         motionParams.no = motionParams.no || 0;
         motionParams.priority = motionParams.priority || 2;
+        if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
+            this._autoIdle = motionParams.autoIdle;
+        }
         if (motionParams.priority == LAppDefine.PriorityForce) {
             this._motionManager.setReservePriority(motionParams.priority);
         }
@@ -300,7 +280,7 @@ var LAppModel = /** @class */ (function (_super) {
             }).then(function (arrayBuffer) {
                 var buffer = arrayBuffer;
                 var size = buffer.byteLength;
-                motion = _this.loadMotion(buffer, size, null);
+                motion = _this.loadMotion(buffer, size, motionParams.groupName, motionParams.priority);
                 var fadeTime = motionParams.fadeInTime || _this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
                 if (fadeTime >= 0.0) {
                     motion.setFadeInTime(fadeTime);
@@ -501,7 +481,8 @@ var LAppModel = /** @class */ (function (_super) {
             }).then(function (arrayBuffer) {
                 var buffer = arrayBuffer;
                 var size = buffer.byteLength;
-                var tmpMotion = _this.loadMotion(buffer, size, name_2);
+                var priority = name_2.split('_')[0] === _this._motionIdleName ? LAppDefine.PriorityIdle : LAppDefine.PriorityNormal;
+                var tmpMotion = _this.loadMotion(buffer, size, name_2, priority);
                 var fadeTime = _this._modelSetting.getMotionFadeInTimeValue(group, i);
                 if (fadeTime >= 0.0) {
                     tmpMotion.setFadeInTime(fadeTime);
@@ -606,6 +587,30 @@ var LAppModel = /** @class */ (function (_super) {
             this.getRenderer().setMvpMatrix(matrix);
             this.doDraw();
         }
+    };
+    LAppModel.prototype.fetchFile = function (path, type) {
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open('GET', path, true);
+            if (type) {
+                request.responseType = type;
+            }
+            request.onload = function () {
+                var options = {
+                    status: request.status,
+                    statusText: request.statusText,
+                };
+                if ((new RegExp('^file:\/\/\\S+')).test(window.location.href) && options.status === 0) {
+                    options.status = 200;
+                }
+                var body = 'response' in request ? request.response : request.responseText;
+                resolve(new Response(body, options));
+            };
+            request.onerror = function () {
+                reject(new TypeError('Local request failed'));
+            };
+            request.send();
+        });
     };
     /**
      * 执行一组动作。

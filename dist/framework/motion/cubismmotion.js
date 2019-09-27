@@ -129,11 +129,13 @@ export var Live2DCubismFramework;
          * @param size 缓冲区大小
          * @return 创建的实例
          */
-        CubismMotion.create = function (buffer, size) {
+        CubismMotion.create = function (buffer, size, name, priority) {
             var ret = new CubismMotion();
             ret.parse(buffer, size);
             ret._sourceFrameRate = ret._motionData.fps;
             ret._loopDurationSeconds = ret._motionData.duration;
+            ret._name = name;
+            ret._weight = priority;
             // NOTE: 在编辑器中，不支持带循环的运动导出
             // ret->_loop = (ret->_motionData->Loop > 0);
             return ret;

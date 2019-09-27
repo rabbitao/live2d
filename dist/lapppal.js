@@ -22,9 +22,9 @@ var LAppPal = /** @class */ (function () {
             request.onload = function () {
                 var options = {
                     status: request.status,
-                    statusText: request.statusText
+                    statusText: request.statusText,
                 };
-                if (!(new RegExp('^http:\/\/\\S+')).test(window.location.href) && options.status === 0) {
+                if ((new RegExp('^file:\/\/\\S+')).test(window.location.href) && options.status === 0) {
                     options.status = 200;
                 }
                 var body = 'response' in request ? request.response : request.responseText;

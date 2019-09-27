@@ -26,6 +26,7 @@ export var Live2DCubismFramework;
             this._weight = 1.0;
             this._offsetSeconds = 0.0; // 播放开始时间
             this._firedEventValues = new csmVector();
+            this._name = '';
         }
         /**
          * 销毁实例
@@ -62,7 +63,7 @@ export var Live2DCubismFramework;
                     // duration == -1 则循环
                 }
             }
-            var fadeWeight = this._weight; // 应用运动的权重
+            var fadeWeight = 1; // 应用运动的权重
             // ---- 淡入/淡出处理 ----
             // 具有简单的正弦功能
             var fadeIn = this._fadeInSeconds == 0.0

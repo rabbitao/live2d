@@ -21,6 +21,7 @@ export declare namespace Live2DCubismFramework {
         _fadeOutSeconds: number;
         _weight: number;
         _offsetSeconds: number;
+        _name: string;
         _firedEventValues: csmVector<csmString>;
         /**
          * 构造函数

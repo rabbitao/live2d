@@ -53,6 +53,7 @@ export declare class LAppModel extends CubismUserModel {
     _mouthSpeedCal: number;
     _mouthParamY: Array<number>;
     _mouthOpenIndex: number;
+    _autoIdle: boolean;
     /**
      * 构造函数
      */
@@ -60,7 +61,6 @@ export declare class LAppModel extends CubismUserModel {
         path: string;
         modelName: string;
     });
-    private fetchFile;
     /**
      * model3.json从目录和文件路径生成模型
      * @param dir
@@ -175,6 +175,7 @@ export declare class LAppModel extends CubismUserModel {
      * 绘制模型的过程。 通过空间的View-Projection矩阵绘制模型。
      */
     draw(matrix: CubismMatrix44): void;
+    private fetchFile;
     /**
      * 执行一组动作。
      */

@@ -26,7 +26,7 @@ export declare namespace Live2DCubismFramework {
          * @param size 缓冲区大小
          * @return 创建的实例
          */
-        static create(buffer: ArrayBuffer, size: number): CubismMotion;
+        static create(buffer: ArrayBuffer, size: number, name: string, priority: number): CubismMotion;
         _sourceFrameRate: number;
         _loopDurationSeconds: number;
         _isLoop: boolean;

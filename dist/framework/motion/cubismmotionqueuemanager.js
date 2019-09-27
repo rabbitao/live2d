@@ -72,6 +72,7 @@ export var Live2DCubismFramework;
                 motionQueueEntry = new CubismMotionQueueEntry(); // 完成后丢弃
                 motionQueueEntry._autoDelete = autoDelete;
                 motionQueueEntry._motion = motion;
+                _this._motions.clear();
                 _this._motions.pushBack(motionQueueEntry);
                 var timer = 0;
                 var timeCount = new Date().getTime();

@@ -201,8 +201,8 @@ export var Live2DCubismFramework;
          * @param name 动议的名称
          * @return 运动课
          */
-        CubismUserModel.prototype.loadMotion = function (buffer, size, name) {
-            return CubismMotion.create(buffer, size);
+        CubismUserModel.prototype.loadMotion = function (buffer, size, name, priority) {
+            return CubismMotion.create(buffer, size, name, priority);
         };
         /**
          * 加载面部表情数据

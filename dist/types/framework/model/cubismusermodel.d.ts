@@ -155,7 +155,7 @@ export declare namespace Live2DCubismFramework {
          * @param name 动议的名称
          * @return 运动课
          */
-        loadMotion(buffer: ArrayBuffer, size: number, name: string): ACubismMotion;
+        loadMotion(buffer: ArrayBuffer, size: number, name: string, priority: number): ACubismMotion;
         /**
          * 加载面部表情数据
          * @param buffer 读取exp文件的缓冲区
