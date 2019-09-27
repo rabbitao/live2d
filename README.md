@@ -52,13 +52,14 @@ public void disappear()
  * @param object: { groupName: 动作组名称
  *                  no: 动作索引. 当前动作组内如果有多个动画, 执行索引指定的那个. 默认为0
  *                  priority: 动画权重(默认2).
+ *                  autoIdle: 动作执行完成后是否自动执行idle. 默认true
  *                  fadeInTime: 淡入时间, 默认读model3.json配置表
  *                  fadeOutTime: 淡出时间, 默认读model3.json配置表
  *                  callback: 当前动作执行完毕后触发
  *                }
  * @return Promise<Model>
  */
-public Promise startMotion({groupName: string, no?: number, priority?: number, fadeInTime?: number, fadeOutTime?: number, callback?: () => void})
+public Promise startMotion({groupName: string, no?: number, priority?: number, autoIdle?: boolean, fadeInTime?: number, fadeOutTime?: number, callback?: () => void})
 ```
 
 ``` javascript
@@ -76,7 +77,7 @@ public Promise startRandomMotion(groupName: string, priority?: number)
  * @param clear: 为true则清除当前已存在的队列. 否则进行队列追加.  默认false. 
  * @return Promise<Model>
  */
-public Promise startMotionQueue([{groupName: string, no?: number, priority?: number, callback?: () => void}], clear?: boolean)
+public Promise startMotionQueue([{groupName: string, no?: number, priority?: number, autoIdle?: boolean, callback?: () => void}], clear?: boolean)
 ```
   
 ``` javascript

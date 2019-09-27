@@ -20,6 +20,7 @@ export class LAppPal {
 
   public static fetchFile(path: string, type?: XMLHttpRequestResponseType) {
     return new Promise<Response>((resolve, reject) => {
+
       const request = new XMLHttpRequest();
       request.open('GET', path, true);
       if (type) {
@@ -28,17 +29,18 @@ export class LAppPal {
       request.onload = () => {
         let options = {
           status: request.status,
-          statusText: request.statusText
-        }
-        if (!(new RegExp('^http:\/\/\\S+')).test(window.location.href) && options.status === 0) {
+          statusText: request.statusText,
+        };
+        if ((new RegExp('^file:\/\/\\S+')).test(window.location.href) && options.status === 0) {
           options.status = 200;
         }
-        let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText
-        resolve(new Response(body, options))
+        let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText;
+        resolve(new Response(body, options));
       };
-      request.onerror = function () {
-        reject(new TypeError('Local request failed'))
-      }
+      request.onerror = () => {
+        reject(new TypeError('Local request failed'));
+      };
+
       request.send();
     });
   }

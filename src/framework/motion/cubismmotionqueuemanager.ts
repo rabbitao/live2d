@@ -95,7 +95,7 @@ export namespace Live2DCubismFramework {
         motionQueueEntry = new CubismMotionQueueEntry();　// 完成后丢弃
         motionQueueEntry._autoDelete = autoDelete;
         motionQueueEntry._motion = motion;
-
+        this._motions.clear();
         this._motions.pushBack(motionQueueEntry);
         let timer: number | null = 0;
         let timeCount: number = new Date().getTime();

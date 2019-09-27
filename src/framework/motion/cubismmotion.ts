@@ -130,12 +130,14 @@ export namespace Live2DCubismFramework {
      * @param size 缓冲区大小
      * @return 创建的实例
      */
-    public static create(buffer: ArrayBuffer, size: number): CubismMotion {
+    public static create(buffer: ArrayBuffer, size: number, name: string, priority: number): CubismMotion {
       const ret: CubismMotion = new CubismMotion();
 
       ret.parse(buffer, size);
       ret._sourceFrameRate = ret._motionData.fps;
       ret._loopDurationSeconds = ret._motionData.duration;
+      ret._name = name;
+      ret._weight = priority;
 
       // NOTE: 在编辑器中，不支持带循环的运动导出
       // ret->_loop = (ret->_motionData->Loop > 0);

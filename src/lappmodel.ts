@@ -122,6 +122,7 @@ export class LAppModel extends CubismUserModel {
   public _mouthSpeedCal: number; // 用来计算速度的临时变量
   public _mouthParamY: Array<number>; // 嘴巴动态数组
   public _mouthOpenIndex: number; // 嘴巴动态数组索引
+  public _autoIdle: boolean; // 是否在动作结束后自动执行idle
 
   /**
    * 构造函数
@@ -160,32 +161,7 @@ export class LAppModel extends CubismUserModel {
     this._mouthOpenIndex = 0;
     this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
     this._modelTextures = [];
-  }
-
-  private fetchFile(path: string, type?: XMLHttpRequestResponseType) {
-    return new Promise<Response>((resolve, reject) => {
-      const request = new XMLHttpRequest();
-      request.open('GET', path, true);
-      if (type) {
-        request.responseType = type;
-      }
-      request.onload = () => {
-        let options = {
-          status: request.status,
-          statusText: request.statusText
-        }
-
-        if (!(new RegExp('^http:\/\/\\S+')).test(window.location.href) && options.status === 0) {
-          options.status = 200;
-        }
-        let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText
-        resolve(new Response(body, options))
-      };
-      request.onerror = function () {
-        reject(new TypeError('Local request failed'))
-      }
-      request.send();
-    });
+    this._autoIdle = true;
   }
 
   /**
@@ -251,7 +227,7 @@ export class LAppModel extends CubismUserModel {
 
     // --------------------------------------------------------------------------
     this._model.loadParameters();   // 加载上次保存的状态
-    if (this._motionManager.isFinished()) {
+    if (this._motionManager.isFinished() && this._autoIdle) {
       // 如果没有动作播放，则从待机动作中随机播放
       this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
 
@@ -311,7 +287,7 @@ export class LAppModel extends CubismUserModel {
           if (this._mouthOpenIndex >= 46) {
             this._mouthOpenIndex = 0;
           }
-          this._lastLipSyncValue = value
+          this._lastLipSyncValue = value;
           this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1);
         }
         this._mouthSpeedCal = this._mouthSpeed;
@@ -337,10 +313,13 @@ export class LAppModel extends CubismUserModel {
    * @param priority 优先级
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
-  public startMotion(motionParams: CubismMotionParam = { groupName: '', no: 0, priority: 2}): Promise<CubismUserModel> {
+  public startMotion(motionParams: CubismMotionParam = { groupName: '', no: 0, priority: 2, autoIdle: true}): Promise<CubismUserModel> {
     this._modelClear = false;
     motionParams.no = motionParams.no || 0;
     motionParams.priority = motionParams.priority || 2;
+    if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
+      this._autoIdle = motionParams.autoIdle as boolean;
+    }
     if (motionParams.priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(motionParams.priority);
     } else if (!this._motionManager.reserveMotion(motionParams.priority)) {
@@ -372,7 +351,7 @@ export class LAppModel extends CubismUserModel {
           const buffer: ArrayBuffer = arrayBuffer;
           const size = buffer.byteLength;
 
-          motion = this.loadMotion(buffer, size, null as any) as CubismMotion;
+          motion = this.loadMotion(buffer, size, motionParams.groupName, motionParams.priority) as CubismMotion;
           let fadeTime: number = motionParams.fadeInTime || this._modelSetting.getMotionFadeInTimeValue(motionParams.groupName, motionParams.no);
 
           if (fadeTime >= 0.0) {
@@ -421,7 +400,6 @@ export class LAppModel extends CubismUserModel {
     }
     priority = priority || 2;
     const no: number = Math.floor(Math.random() * this._modelSetting.getMotionCount(group));
-
     return this.startMotion({groupName: group, no, priority});
   }
 
@@ -466,7 +444,7 @@ export class LAppModel extends CubismUserModel {
   */
   public replaceIdleMotion(groupName: string, execImmediately: boolean = true) {
     if (this._motionIdleName === groupName) {
-      return
+      return;
     }
     this._motionManager.stopAllMotions();
     this._motionIdleName = groupName;
@@ -480,7 +458,7 @@ export class LAppModel extends CubismUserModel {
   */
   public mouthOpen(speed) {
     if (Object.prototype.toString.call(speed) === '[object Number]') {
-      speed = speed < 1 ? 1 : speed
+      speed = speed < 1 ? 1 : speed;
       this._mouthSpeed = speed;
     }
     this._mouthOpen = true;
@@ -597,8 +575,8 @@ export class LAppModel extends CubismUserModel {
         (arrayBuffer) => {
           const buffer: ArrayBuffer = arrayBuffer;
           const size = buffer.byteLength;
-
-          const tmpMotion: CubismMotion = this.loadMotion(buffer, size, name) as CubismMotion;
+          const priority = name.split('_')[0] === this._motionIdleName ? LAppDefine.PriorityIdle : LAppDefine.PriorityNormal;
+          const tmpMotion: CubismMotion = this.loadMotion(buffer, size, name, priority) as CubismMotion;
 
           let fadeTime = this._modelSetting.getMotionFadeInTimeValue(group, i);
           if (fadeTime >= 0.0) {
@@ -721,6 +699,33 @@ export class LAppModel extends CubismUserModel {
       this.doDraw();
     }
   }
+
+  private fetchFile(path: string, type?: XMLHttpRequestResponseType) {
+    return new Promise<Response>((resolve, reject) => {
+
+      const request = new XMLHttpRequest();
+      request.open('GET', path, true);
+      if (type) {
+        request.responseType = type;
+      }
+      request.onload = () => {
+        let options = {
+          status: request.status,
+          statusText: request.statusText,
+        };
+        if ((new RegExp('^file:\/\/\\S+')).test(window.location.href) && options.status === 0) {
+          options.status = 200;
+        }
+        let body = 'response' in request ? request.response : (request as XMLHttpRequest).responseText;
+        resolve(new Response(body, options));
+      };
+      request.onerror = () => {
+        reject(new TypeError('Local request failed'));
+      };
+
+      request.send();
+    });
+  }
   /**
    * 执行一组动作。
    */
@@ -732,7 +737,7 @@ export class LAppModel extends CubismUserModel {
     this.startMotion(this._motionQueue[0]).then(() => {
       this._motionQueue.shift();
       this.executeMotionQueue();
-    }).catch(e => {
+    }).catch((e) => {
       console.error('[APP]当前动作无效.', this._motionQueue[0], e);
       this._motionQueue.shift();
       this.executeMotionQueue();
@@ -759,7 +764,6 @@ export class LAppModel extends CubismUserModel {
       if (this._modelSetting.getModelFileName() != '') {
         let path: string = this._modelSetting.getModelFileName();
         path = this._modelHomeDir + path;
-
         this.fetchFile(path, 'arraybuffer').then(
           (response) => {
             return response.arrayBuffer();

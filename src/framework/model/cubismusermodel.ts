@@ -264,8 +264,8 @@ export namespace Live2DCubismFramework {
      * @param name 动议的名称
      * @return 运动课
      */
-    public loadMotion(buffer: ArrayBuffer, size: number, name: string): ACubismMotion {
-      return CubismMotion.create(buffer, size);
+    public loadMotion(buffer: ArrayBuffer, size: number, name: string, priority: number): ACubismMotion {
+      return CubismMotion.create(buffer, size, name, priority);
     }
 
     /**

@@ -38,7 +38,7 @@ export namespace Live2DCubismFramework {
     public _fadeOutSeconds: number; // 淡出时间[秒]
     public _weight: number; // 应用运动的权重
     public _offsetSeconds: number; // 动作播放开始时间[秒]
-
+    public _name: string;
     public _firedEventValues: csmVector<csmString>;
 
     /**
@@ -50,6 +50,7 @@ export namespace Live2DCubismFramework {
       this._weight = 1.0;
       this._offsetSeconds = 0.0;  // 播放开始时间
       this._firedEventValues = new csmVector<csmString>();
+      this._name = '';
     }
 
     /**
@@ -84,7 +85,7 @@ export namespace Live2DCubismFramework {
         }
       }
 
-      let fadeWeight: number = this._weight; // 应用运动的权重
+      let fadeWeight: number = 1; // 应用运动的权重
 
       // ---- 淡入/淡出处理 ----
       // 具有简单的正弦功能
@@ -97,9 +98,7 @@ export namespace Live2DCubismFramework {
         : CubismMath.getEasingSine((motionQueueEntry.getEndTime() - userTimeSeconds) / this._fadeOutSeconds);
 
       fadeWeight = fadeWeight * fadeIn * fadeOut;
-
       motionQueueEntry.setState(userTimeSeconds, fadeWeight);
-
       CSM_ASSERT(0.0 <= fadeWeight && fadeWeight <= 1.0);
 
       // ---- 遍历所有参数ID ----
