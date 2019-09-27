@@ -21,8 +21,8 @@ export function strtod(s, endPtr) {
             continue;
         }
         // 扩展字符串的范围
-        var test_1 = s.substring(0, i);
-        var number = Number(test_1);
+        var test = s.substring(0, i);
+        var number = Number(test);
         if (isNaN(number)) {
             // 完成因为它不能再被识别为数值
             break;
