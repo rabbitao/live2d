@@ -1,4 +1,4 @@
-/// <reference path="../../../../src/live2dcubismcore.d.ts" />
+/// <reference types="src/live2dcubismcore" />
 import { Live2DCubismFramework as cubismrenderer } from '../rendering/cubismrenderer';
 import { Live2DCubismFramework as cubismid } from '../id/cubismid';
 import CubismBlendMode = cubismrenderer.CubismBlendMode;

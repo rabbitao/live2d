@@ -1,4 +1,4 @@
-/// <reference path="../../../../src/live2dcubismcore.d.ts" />
+/// <reference types="src/live2dcubismcore" />
 import { Live2DCubismFramework as cubismmodel } from './cubismmodel';
 import CubismModel = cubismmodel.CubismModel;
 export declare namespace Live2DCubismFramework {

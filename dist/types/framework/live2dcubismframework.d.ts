@@ -1,4 +1,4 @@
-/// <reference path="../../../src/live2dcubismcore.d.ts" />
+/// <reference types="src/live2dcubismcore" />
 import { Live2DCubismFramework as cubismidmanager } from './id/cubismidmanager';
 import CubismIdManager = cubismidmanager.CubismIdManager;
 export declare function strtod(s: string, endPtr: string[]): number;
