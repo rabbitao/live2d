@@ -79,7 +79,6 @@ export namespace Live2DCubismFramework {
         if (motion == null) {
           return model;
         }
-
         let motionQueueEntry: CubismMotionQueueEntry = null as any;
 
         // 如果已经有动作，则提高结束标志
@@ -88,7 +87,6 @@ export namespace Live2DCubismFramework {
           if (motionQueueEntry == null) {
             continue;
           }
-
           motionQueueEntry.startFadeout(motionQueueEntry._motion.getFadeOutTime(), userTimeSeconds); // 开始和结束淡出
         }
 
@@ -133,7 +131,6 @@ export namespace Live2DCubismFramework {
       if (!this._motions) {
         return true;
       }
-      
       for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
         let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
 
@@ -159,7 +156,6 @@ export namespace Live2DCubismFramework {
           ite.preIncrement();
         }
       }
-      
       return true;
     }
 
@@ -176,7 +172,6 @@ export namespace Live2DCubismFramework {
         if (motionQueueEntry == null) {
           continue;
         }
-
         if (motionQueueEntry._motionQueueEntryHandle == motionQueueEntryNumber && !motionQueueEntry.isFinished()) {
           return false;
         }
@@ -187,7 +182,7 @@ export namespace Live2DCubismFramework {
     public isFinishedByMotionName(motionName: string) {
       if (motionName) {
         let motionArray = this._motions.get();
-        let find = motionArray.find(item => { return item._motion._name === motionName });
+        let find = motionArray.find((item) => { return item._motion._name === motionName; });
         if (!find) {
           return true;
         } else {
@@ -197,7 +192,7 @@ export namespace Live2DCubismFramework {
         }
         return false;
       }
-      return true
+      return true;
     }
 
     /**
@@ -206,13 +201,10 @@ export namespace Live2DCubismFramework {
     public stopAllMotions(): void {
       // ------- 它执行的过程 -------
       // 如果已经有动作，则提高结束标志
-
       for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
         let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
-
         if (motionQueueEntry == null) {
           ite = this._motions.erase(ite);
-
           continue;
         }
 
@@ -236,16 +228,13 @@ export namespace Live2DCubismFramework {
       // 如果已经有动作，则提高结束标志
       for (const ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end()); ite.preIncrement()) {
         const motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
-
         if (motionQueueEntry == null) {
           continue;
         }
-
         if (motionQueueEntry._motionQueueEntryHandle == motionQueueEntryNumber) {
           return motionQueueEntry;
         }
       }
-
       return null as any;
     }
 
@@ -317,7 +306,6 @@ export namespace Live2DCubismFramework {
           ite.preIncrement();
         }
       }
-
       return updated;
     }
   }
