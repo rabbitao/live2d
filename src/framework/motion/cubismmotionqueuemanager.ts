@@ -97,12 +97,14 @@ export namespace Live2DCubismFramework {
         motionQueueEntry._motion = motion;
         this._motions.clear();
         this._motions.pushBack(motionQueueEntry);
-        let timer: number | null = 0;
-        let timeCount: number = new Date().getTime();
-        timer = window.setInterval(() => {
-          if (this.isFinished()) {
+        if (motion._name.split('_')[0] === model._motionIdleName) {
+          resolve();
+          return;
+        }
+        const timeCount: number = new Date().getTime();
+        const timer = window.setInterval(() => {
+          if (this.isFinishedByMotionName(motion._name)) {
             window.clearInterval(timer as number);
-            timer = null;
             if (Object.prototype.toString.call(callback) === '[object Function]') {
               (callback as (() => void))();
             }
@@ -111,6 +113,7 @@ export namespace Live2DCubismFramework {
           } else {
             let now = new Date().getTime();
             if (now - timeCount >= 30000) {
+              window.clearInterval(timer as number);
               this._currentPriority = 0;
               reject(new Error('动画执行超时(30s)'));
             }
@@ -130,6 +133,7 @@ export namespace Live2DCubismFramework {
       if (!this._motions) {
         return true;
       }
+      
       for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
         let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
 
@@ -155,6 +159,7 @@ export namespace Live2DCubismFramework {
           ite.preIncrement();
         }
       }
+      
       return true;
     }
 
@@ -177,6 +182,22 @@ export namespace Live2DCubismFramework {
         }
       }
       return true;
+    }
+
+    public isFinishedByMotionName(motionName: string) {
+      if (motionName) {
+        let motionArray = this._motions.get();
+        let find = motionArray.find(item => { return item._motion._name === motionName });
+        if (!find) {
+          return true;
+        } else {
+          if (find.isFinished()) {
+            return true;
+          }
+        }
+        return false;
+      }
+      return true
     }
 
     /**

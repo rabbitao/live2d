@@ -379,12 +379,6 @@ export class LAppModel extends CubismUserModel {
         reject(new Error('没有可执行的motion'));
       });
     }
-    if (motionParams.groupName === 'Idle') {
-      this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
-      return new Promise<CubismUserModel>((reslove) => {
-        reslove();
-      });
-    }
     return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
   }
 
