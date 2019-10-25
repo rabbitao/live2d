@@ -100,7 +100,6 @@ export namespace Live2DCubismFramework {
     protected _accelerationX: number;     // X轴加速度
     protected _accelerationY: number;     // Y轴加速度
     protected _accelerationZ: number;     // Z轴方向的加速度
-    protected _debugMode: boolean;    // 是否处于调试模式
 
     private _renderer: CubismRenderer_WebGL;                  // 渲染
 
@@ -131,7 +130,6 @@ export namespace Live2DCubismFramework {
       this._accelerationX = 0.0;
       this._accelerationY = 0.0;
       this._accelerationZ = 0.0;
-      this._debugMode = false;
       this._renderer = null as any;
       this._motionQueue = [];
       this._motionIdleName = LAppDefine.MotionGroupIdle;

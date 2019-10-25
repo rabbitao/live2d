@@ -197,4 +197,8 @@ export class LAppLive2DManager {
       });
     });
   }
+
+  public setDebugMode(mode: boolean) {
+    LAppDefine.DebugMode = mode
+  }
 }

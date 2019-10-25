@@ -18,6 +18,8 @@ import csmVector = csmvector.csmVector;
 import iterator = csmvector.iterator;
 import CubismMotionQueueEntry = cubismmotionqueueentry.CubismMotionQueueEntry;
 import ACubismMotion = acubismmotion.ACubismMotion;
+import { LAppDefine } from '../../lappdefine';
+import { LAppPal } from '../../lapppal';
 
 export namespace Live2DCubismFramework {
   /**
@@ -107,6 +109,10 @@ export namespace Live2DCubismFramework {
               (callback as (() => void))();
             }
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
+            if (LAppDefine.DebugMode) {
+              LAppPal.printLog('[APP]resolve motion {0}', motion._name)
+              LAppPal.printLog('----------------------------------')
+            }
             resolve(model);
           } else {
             let now = new Date().getTime();

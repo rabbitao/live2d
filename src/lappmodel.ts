@@ -228,6 +228,9 @@ export class LAppModel extends CubismUserModel {
     // --------------------------------------------------------------------------
     this._model.loadParameters();   // 加载上次保存的状态
     if (this._motionManager.isFinished() && this._autoIdle) {
+      if (LAppDefine.DebugMode) {
+        LAppPal.printLog('[APP]update check finished {0}', this._motionIdleName);
+      }
       // 如果没有动作播放，则从待机动作中随机播放
       this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
 
@@ -323,9 +326,6 @@ export class LAppModel extends CubismUserModel {
     if (motionParams.priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(motionParams.priority);
     } else if (!this._motionManager.reserveMotion(motionParams.priority)) {
-      if (this._debugMode) {
-        LAppPal.printLog('[APP]can\'t start motion.');
-      }
       return new Promise<CubismUserModel>((reslove, reject) => {
         reject(new Error('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue));
       });
@@ -371,8 +371,8 @@ export class LAppModel extends CubismUserModel {
       );
     }
 
-    if (this._debugMode) {
-      LAppPal.printLog('[APP]start motion: [{0}_{1}', motionParams.groupName, motionParams.no);
+    if (LAppDefine.DebugMode) {
+      LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
     }
     if (motion == null) {
       return new Promise<CubismUserModel>((reslove, reject) => {
@@ -391,6 +391,9 @@ export class LAppModel extends CubismUserModel {
   public startRandomMotion(group: string, priority?: number): Promise<CubismUserModel> {
     if (this._modelSetting.getMotionCount(group) == 0) {
       return InvalidMotionQueueEntryHandleValue;
+    }
+    if (LAppDefine.DebugMode) {
+      LAppPal.printLog('[APP]startRandomMotion {0} {1}', group, priority);
     }
     priority = priority || 2;
     const no: number = Math.floor(Math.random() * this._modelSetting.getMotionCount(group));
@@ -437,14 +440,14 @@ export class LAppModel extends CubismUserModel {
   * 更改idle动作的名称.
   */
   public replaceIdleMotion(groupName: string, execImmediately: boolean = true) {
+    if (execImmediately) {
+      this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+    }
     if (this._motionIdleName === groupName) {
       return;
     }
     this._motionManager.stopAllMotions();
     this._motionIdleName = groupName;
-    if (execImmediately) {
-      this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
-    }
   }
 
   /**
@@ -481,13 +484,13 @@ export class LAppModel extends CubismUserModel {
   public setExpression(expressionId: string): void {
     const motion: ACubismMotion = this._expressions.getValue(expressionId);
 
-    if (this._debugMode) {
+    if (LAppDefine.DebugMode) {
       LAppPal.printLog('[APP]expression: [{0}]', expressionId);
     }
     if (motion != null) {
       this._expressionManager.startMotionPriority(motion, false, LAppDefine.PriorityForce, this);
     } else {
-      if (this._debugMode) {
+      if (LAppDefine.DebugMode) {
         LAppPal.printLog('[APP]expression[{0}] is null', expressionId);
       }
     }
@@ -557,7 +560,7 @@ export class LAppModel extends CubismUserModel {
       let path = this._modelSetting.getMotionFileName(group, i);
       path = this._modelHomeDir + path;
 
-      if (this._debugMode) {
+      if (LAppDefine.DebugMode) {
         LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
       }
 
@@ -1053,7 +1056,7 @@ export class LAppModel extends CubismUserModel {
         let modelTextureName = this._modelSetting.getTextureFileName(modelTextureNumber);
         // 如果纹理名称是空字符，请跳过加载/绑定过程
         if (modelTextureName == '') {
-          console.log('getTextureFileName null');
+          LAppPal.printLog('[APP]getTextureFileName null');
           continue;
         }
         // 如果用户指定了纹理名称 则只加载用户指定的纹理

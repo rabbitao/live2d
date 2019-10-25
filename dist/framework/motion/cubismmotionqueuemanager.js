@@ -74,12 +74,14 @@ export var Live2DCubismFramework;
                 motionQueueEntry._motion = motion;
                 _this._motions.clear();
                 _this._motions.pushBack(motionQueueEntry);
-                var timer = 0;
+                if (motion._name.split('_')[0] === model._motionIdleName) {
+                    resolve();
+                    return;
+                }
                 var timeCount = new Date().getTime();
-                timer = window.setInterval(function () {
-                    if (_this.isFinished()) {
+                var timer = window.setInterval(function () {
+                    if (_this.isFinishedByMotionName(motion._name)) {
                         window.clearInterval(timer);
-                        timer = null;
                         if (Object.prototype.toString.call(callback) === '[object Function]') {
                             callback();
                         }
@@ -89,6 +91,7 @@ export var Live2DCubismFramework;
                     else {
                         var now = new Date().getTime();
                         if (now - timeCount >= 30000) {
+                            window.clearInterval(timer);
                             _this._currentPriority = 0;
                             reject(new Error('动画执行超时(30s)'));
                         }
@@ -147,6 +150,22 @@ export var Live2DCubismFramework;
                 if (motionQueueEntry._motionQueueEntryHandle == motionQueueEntryNumber && !motionQueueEntry.isFinished()) {
                     return false;
                 }
+            }
+            return true;
+        };
+        CubismMotionQueueManager.prototype.isFinishedByMotionName = function (motionName) {
+            if (motionName) {
+                var motionArray = this._motions.get();
+                var find = motionArray.find(function (item) { return item._motion._name === motionName; });
+                if (!find) {
+                    return true;
+                }
+                else {
+                    if (find.isFinished()) {
+                        return true;
+                    }
+                }
+                return false;
             }
             return true;
         };

@@ -59,6 +59,7 @@ export declare namespace Live2DCubismFramework {
          * @return false 没完
          */
         isFinishedByHandle(motionQueueEntryNumber: CubismMotionQueueEntryHandle): boolean;
+        isFinishedByMotionName(motionName: string): boolean;
         /**
          * 停止所有动作
          */

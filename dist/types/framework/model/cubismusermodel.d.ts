@@ -54,7 +54,7 @@ export declare namespace Live2DCubismFramework {
         protected _modelClear: boolean;
         protected _motionManager: CubismMotionManager;
         protected _motionQueue: CubismMotionParam[];
-        protected _motionIdleName: string;
+        _motionIdleName: string;
         protected _expressionManager: CubismMotionManager;
         protected _eyeBlink: CubismEyeBlink;
         protected _breath: CubismBreath;

@@ -70,6 +70,7 @@ export namespace LAppDefine {
   // 调试日志显示选项
   export const DebugLogEnable: boolean = true;
   export const DebugTouchLogEnable: boolean = false;
+  export let DebugMode: boolean = false;
 
   // Framework的日志级别设置输出
   export const CubismLoggingLevel: LogLevel = LogLevel.LogLevel_Verbose;

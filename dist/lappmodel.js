@@ -302,12 +302,6 @@ var LAppModel = /** @class */ (function (_super) {
                 reject(new Error('没有可执行的motion'));
             });
         }
-        if (motionParams.groupName === 'Idle') {
-            this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
-            return new Promise(function (reslove) {
-                reslove();
-            });
-        }
         return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
     };
     /**
