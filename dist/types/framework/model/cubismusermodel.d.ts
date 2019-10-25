@@ -74,7 +74,6 @@ export declare namespace Live2DCubismFramework {
         protected _accelerationX: number;
         protected _accelerationY: number;
         protected _accelerationZ: number;
-        protected _debugMode: boolean;
         private _renderer;
         /**
          * 构造函数

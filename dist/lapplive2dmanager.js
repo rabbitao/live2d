@@ -174,6 +174,9 @@ var LAppLive2DManager = /** @class */ (function () {
             });
         });
     };
+    LAppLive2DManager.prototype.setDebugMode = function (mode) {
+        LAppDefine.DebugMode = mode;
+    };
     return LAppLive2DManager;
 }());
 export { LAppLive2DManager };

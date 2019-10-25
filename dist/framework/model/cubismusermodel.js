@@ -67,7 +67,6 @@ export var Live2DCubismFramework;
             this._accelerationX = 0.0;
             this._accelerationY = 0.0;
             this._accelerationZ = 0.0;
-            this._debugMode = false;
             this._renderer = null;
             this._motionQueue = [];
             this._motionIdleName = LAppDefine.MotionGroupIdle;

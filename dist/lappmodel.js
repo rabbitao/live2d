@@ -172,6 +172,9 @@ var LAppModel = /** @class */ (function (_super) {
         // --------------------------------------------------------------------------
         this._model.loadParameters(); // 加载上次保存的状态
         if (this._motionManager.isFinished() && this._autoIdle) {
+            if (LAppDefine.DebugMode) {
+                LAppPal.printLog('[APP]update check finished {0}', this._motionIdleName);
+            }
             // 如果没有动作播放，则从待机动作中随机播放
             this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
         }
@@ -260,9 +263,6 @@ var LAppModel = /** @class */ (function (_super) {
             this._motionManager.setReservePriority(motionParams.priority);
         }
         else if (!this._motionManager.reserveMotion(motionParams.priority)) {
-            if (this._debugMode) {
-                LAppPal.printLog('[APP]can\'t start motion.');
-            }
             return new Promise(function (reslove, reject) {
                 reject(new Error('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue));
             });
@@ -294,8 +294,8 @@ var LAppModel = /** @class */ (function (_super) {
                 deleteBuffer(buffer, path_1);
             });
         }
-        if (this._debugMode) {
-            LAppPal.printLog('[APP]start motion: [{0}_{1}', motionParams.groupName, motionParams.no);
+        if (LAppDefine.DebugMode) {
+            LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
         }
         if (motion == null) {
             return new Promise(function (reslove, reject) {
@@ -313,6 +313,9 @@ var LAppModel = /** @class */ (function (_super) {
     LAppModel.prototype.startRandomMotion = function (group, priority) {
         if (this._modelSetting.getMotionCount(group) == 0) {
             return InvalidMotionQueueEntryHandleValue;
+        }
+        if (LAppDefine.DebugMode) {
+            LAppPal.printLog('[APP]startRandomMotion {0} {1}', group, priority);
         }
         priority = priority || 2;
         var no = Math.floor(Math.random() * this._modelSetting.getMotionCount(group));
@@ -360,14 +363,14 @@ var LAppModel = /** @class */ (function (_super) {
     */
     LAppModel.prototype.replaceIdleMotion = function (groupName, execImmediately) {
         if (execImmediately === void 0) { execImmediately = true; }
+        if (execImmediately) {
+            this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
+        }
         if (this._motionIdleName === groupName) {
             return;
         }
         this._motionManager.stopAllMotions();
         this._motionIdleName = groupName;
-        if (execImmediately) {
-            this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
-        }
     };
     /**
     * 嘴巴进行说话动作.
@@ -398,14 +401,14 @@ var LAppModel = /** @class */ (function (_super) {
      */
     LAppModel.prototype.setExpression = function (expressionId) {
         var motion = this._expressions.getValue(expressionId);
-        if (this._debugMode) {
+        if (LAppDefine.DebugMode) {
             LAppPal.printLog('[APP]expression: [{0}]', expressionId);
         }
         if (motion != null) {
             this._expressionManager.startMotionPriority(motion, false, LAppDefine.PriorityForce, this);
         }
         else {
-            if (this._debugMode) {
+            if (LAppDefine.DebugMode) {
                 LAppPal.printLog('[APP]expression[{0}] is null', expressionId);
             }
         }
@@ -467,7 +470,7 @@ var LAppModel = /** @class */ (function (_super) {
             var name_2 = CubismString.getFormatedString('{0}_{1}', group, i);
             var path = this_1._modelSetting.getMotionFileName(group, i);
             path = this_1._modelHomeDir + path;
-            if (this_1._debugMode) {
+            if (LAppDefine.DebugMode) {
                 LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
             }
             this_1.fetchFile(path, 'arraybuffer').then(function (response) {
@@ -866,7 +869,7 @@ var LAppModel = /** @class */ (function (_super) {
                 var modelTextureName = this_2._modelSetting.getTextureFileName(modelTextureNumber);
                 // 如果纹理名称是空字符，请跳过加载/绑定过程
                 if (modelTextureName == '') {
-                    console.log('getTextureFileName null');
+                    LAppPal.printLog('[APP]getTextureFileName null');
                     return "continue";
                 }
                 // 如果用户指定了纹理名称 则只加载用户指定的纹理

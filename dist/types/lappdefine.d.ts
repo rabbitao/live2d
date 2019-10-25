@@ -33,5 +33,6 @@ export declare namespace LAppDefine {
     const PriorityForce: number;
     const DebugLogEnable: boolean;
     const DebugTouchLogEnable: boolean;
+    let DebugMode: boolean;
     const CubismLoggingLevel: LogLevel;
 }

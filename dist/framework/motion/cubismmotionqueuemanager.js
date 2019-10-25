@@ -8,6 +8,8 @@ import { Live2DCubismFramework as cubismmotionqueueentry } from './cubismmotionq
 import { Live2DCubismFramework as csmvector } from '../type/csmvector';
 var csmVector = csmvector.csmVector;
 var CubismMotionQueueEntry = cubismmotionqueueentry.CubismMotionQueueEntry;
+import { LAppDefine } from '../../lappdefine';
+import { LAppPal } from '../../lapppal';
 export var Live2DCubismFramework;
 (function (Live2DCubismFramework) {
     /**
@@ -86,6 +88,10 @@ export var Live2DCubismFramework;
                             callback();
                         }
                         // resolve(motionQueueEntry._motionQueueEntryHandle, model);
+                        if (LAppDefine.DebugMode) {
+                            LAppPal.printLog('[APP]resolve motion {0}', motion._name);
+                            LAppPal.printLog('----------------------------------');
+                        }
                         resolve(model);
                     }
                     else {

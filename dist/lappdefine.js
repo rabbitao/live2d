@@ -58,6 +58,7 @@ export var LAppDefine;
     // 调试日志显示选项
     LAppDefine.DebugLogEnable = true;
     LAppDefine.DebugTouchLogEnable = false;
+    LAppDefine.DebugMode = false;
     // Framework的日志级别设置输出
     LAppDefine.CubismLoggingLevel = LogLevel.LogLevel_Verbose;
 })(LAppDefine || (LAppDefine = {}));
