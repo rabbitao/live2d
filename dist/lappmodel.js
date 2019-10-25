@@ -259,6 +259,9 @@ var LAppModel = /** @class */ (function (_super) {
         if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
             this._autoIdle = motionParams.autoIdle;
         }
+        else {
+            this._autoIdle = true;
+        }
         if (motionParams.priority == LAppDefine.PriorityForce) {
             this._motionManager.setReservePriority(motionParams.priority);
         }

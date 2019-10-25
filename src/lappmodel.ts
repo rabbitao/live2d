@@ -322,6 +322,8 @@ export class LAppModel extends CubismUserModel {
     motionParams.priority = motionParams.priority || 2;
     if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
       this._autoIdle = motionParams.autoIdle as boolean;
+    } else {
+      this._autoIdle = true;
     }
     if (motionParams.priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(motionParams.priority);
