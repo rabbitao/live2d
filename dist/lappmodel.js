@@ -266,6 +266,14 @@ var LAppModel = /** @class */ (function (_super) {
             this._motionManager.setReservePriority(motionParams.priority);
         }
         else if (!this._motionManager.reserveMotion(motionParams.priority)) {
+            if (motionParams.priority === LAppDefine.PriorityIdle) {
+                if (LAppDefine.DebugMode) {
+                    LAppPal.printLog('[APP]can\'t start idlePriority motion: {0}_{1}', motionParams.groupName, motionParams.no);
+                }
+                return new Promise(function (reslove, reject) {
+                    reject(null);
+                });
+            }
             return new Promise(function (reslove, reject) {
                 reject(new Error('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue));
             });

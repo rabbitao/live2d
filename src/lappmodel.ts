@@ -328,6 +328,14 @@ export class LAppModel extends CubismUserModel {
     if (motionParams.priority == LAppDefine.PriorityForce) {
       this._motionManager.setReservePriority(motionParams.priority);
     } else if (!this._motionManager.reserveMotion(motionParams.priority)) {
+      if (motionParams.priority === LAppDefine.PriorityIdle) {
+        if (LAppDefine.DebugMode) {
+          LAppPal.printLog('[APP]can\'t start idlePriority motion: {0}_{1}', motionParams.groupName, motionParams.no);
+        }
+        return new Promise<CubismUserModel>((reslove, reject) => {
+          reject(null);
+        });
+      }
       return new Promise<CubismUserModel>((reslove, reject) => {
         reject(new Error('[APP]can\'t start motion. code: ' + InvalidMotionQueueEntryHandleValue));
       });
