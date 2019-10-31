@@ -139,6 +139,14 @@ public void mouthClose()
  */
 public void lookAt(pointX: number, pointY: number)
 ```
+
+``` javascript
+/** 
+ *  获取模型可见状态
+ *  @return true / false
+ */
+public boolean getVisible()
+```
   
 ## Project setup
 ```

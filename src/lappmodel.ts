@@ -641,6 +641,13 @@ export class LAppModel extends CubismUserModel {
   }
 
   /**
+   * 模型显示状态。
+   */
+  public getVisible(): boolean {
+    return !this._modelClear;
+  }
+
+  /**
    * 释放所有运动数据。
    */
   public releaseMotions(): void {

@@ -538,6 +538,12 @@ var LAppModel = /** @class */ (function (_super) {
         this._modelClear = true;
     };
     /**
+     * 模型显示状态。
+     */
+    LAppModel.prototype.getVisible = function () {
+        return !this._modelClear;
+    };
+    /**
      * 释放所有运动数据。
      */
     LAppModel.prototype.releaseMotions = function () {

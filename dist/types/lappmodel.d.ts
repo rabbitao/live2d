@@ -156,6 +156,10 @@ export declare class LAppModel extends CubismUserModel {
      */
     disappear(): void;
     /**
+     * 模型显示状态。
+     */
+    getVisible(): boolean;
+    /**
      * 释放所有运动数据。
      */
     releaseMotions(): void;
