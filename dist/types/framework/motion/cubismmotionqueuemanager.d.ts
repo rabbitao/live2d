@@ -63,7 +63,7 @@ export declare namespace Live2DCubismFramework {
         /**
          * 停止所有动作
          */
-        stopAllMotions(): void;
+        stopAllMotions(): Promise<void>;
         /**
          * 获取指定的CubismMotionQueueEntry
     

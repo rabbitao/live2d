@@ -71,10 +71,10 @@ export namespace Live2DCubismFramework {
       return super.startMotion(motion, autoDelete, this._userTimeSeconds, model, callback);
     }
 
-    public stopAllMotions() {
+    public stopAllMotions(): Promise<void> {
       this._reservePriority = 0;
       this._currentPriority = 0;
-      super.stopAllMotions();
+      return super.stopAllMotions();
     }
 
     /**

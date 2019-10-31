@@ -429,13 +429,17 @@ export class LAppModel extends CubismUserModel {
    * 停止所有动作 清除动作队列 已执行的动作如果有回调函数依旧会执行.
    * @Param clear 是否清除画布内容
    */
-  public stopAllMotions(clear: boolean) {
-    this._motionQueue = [];
-    this._mouthOpen = false;
-    this._motionManager.stopAllMotions();
-    if (clear) {
-      this.clear();
-    }
+  public stopAllMotions(clear: boolean): Promise<void> {
+    return new Promise(resolve => {
+      this._motionQueue = [];
+      this._mouthOpen = false;
+      this._motionManager.stopAllMotions().then(() => {
+        if (clear) {
+          this.clear();
+        }
+        resolve()
+      });
+    })
   }
 
   /**

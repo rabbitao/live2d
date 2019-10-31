@@ -41,7 +41,7 @@ export declare namespace Live2DCubismFramework {
          * @return                返回已启动的运动的标识号。 在IsFinished（）的参数中使用，用于确定单个动作是否已结束。 无法启动时“-1”
          */
         startMotionPriority(motion: ACubismMotion, autoDelete: boolean, priority: number, model: CubismUserModel, callback?: () => void): Promise<CubismUserModel>;
-        stopAllMotions(): void;
+        stopAllMotions(): Promise<void>;
         /**
          * 更新运动以反映模型中的参数值。
          *

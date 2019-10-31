@@ -204,22 +204,25 @@ export namespace Live2DCubismFramework {
     /**
      * 停止所有动作
      */
-    public stopAllMotions(): void {
+    public stopAllMotions(): Promise<void> {
       // ------- 它执行的过程 -------
-      // 如果已经有动作，则提高结束标志
-      for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
-        let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
-        if (motionQueueEntry == null) {
-          ite = this._motions.erase(ite);
-          continue;
-        }
+      return new Promise(resolve => {
+        // 如果已经有动作，则提高结束标志
+        for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
+          let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
+          if (motionQueueEntry == null) {
+            ite = this._motions.erase(ite);
+            continue;
+          }
 
-        // ----- 删除任何已完成的处理 ------
-        motionQueueEntry.release();
-        motionQueueEntry = void 0 as any;
-        motionQueueEntry = null as any;
-        ite = this._motions.erase(ite); // 删除
-      }
+          // ----- 删除任何已完成的处理 ------
+          motionQueueEntry.release();
+          motionQueueEntry = void 0 as any;
+          motionQueueEntry = null as any;
+          ite = this._motions.erase(ite); // 删除
+        }
+        resolve()
+      })
     }
 
     /**

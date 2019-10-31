@@ -179,20 +179,24 @@ export var Live2DCubismFramework;
          * 停止所有动作
          */
         CubismMotionQueueManager.prototype.stopAllMotions = function () {
+            var _this = this;
             // ------- 它执行的过程 -------
-            // 如果已经有动作，则提高结束标志
-            for (var ite = this._motions.begin(); ite.notEqual(this._motions.end());) {
-                var motionQueueEntry = ite.ptr();
-                if (motionQueueEntry == null) {
-                    ite = this._motions.erase(ite);
-                    continue;
+            return new Promise(function (resolve) {
+                // 如果已经有动作，则提高结束标志
+                for (var ite = _this._motions.begin(); ite.notEqual(_this._motions.end());) {
+                    var motionQueueEntry = ite.ptr();
+                    if (motionQueueEntry == null) {
+                        ite = _this._motions.erase(ite);
+                        continue;
+                    }
+                    // ----- 删除任何已完成的处理 ------
+                    motionQueueEntry.release();
+                    motionQueueEntry = void 0;
+                    motionQueueEntry = null;
+                    ite = _this._motions.erase(ite); // 删除
                 }
-                // ----- 删除任何已完成的处理 ------
-                motionQueueEntry.release();
-                motionQueueEntry = void 0;
-                motionQueueEntry = null;
-                ite = this._motions.erase(ite); // 删除
-            }
+                resolve();
+            });
         };
         /**
          * 获取指定的CubismMotionQueueEntry

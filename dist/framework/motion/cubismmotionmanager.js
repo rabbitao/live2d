@@ -73,7 +73,7 @@ export var Live2DCubismFramework;
         CubismMotionManager.prototype.stopAllMotions = function () {
             this._reservePriority = 0;
             this._currentPriority = 0;
-            _super.prototype.stopAllMotions.call(this);
+            return _super.prototype.stopAllMotions.call(this);
         };
         /**
          * 更新运动以反映模型中的参数值。

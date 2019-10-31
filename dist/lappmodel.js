@@ -354,12 +354,17 @@ var LAppModel = /** @class */ (function (_super) {
      * @Param clear 是否清除画布内容
      */
     LAppModel.prototype.stopAllMotions = function (clear) {
-        this._motionQueue = [];
-        this._mouthOpen = false;
-        this._motionManager.stopAllMotions();
-        if (clear) {
-            this.clear();
-        }
+        var _this = this;
+        return new Promise(function (resolve) {
+            _this._motionQueue = [];
+            _this._mouthOpen = false;
+            _this._motionManager.stopAllMotions().then(function () {
+                if (clear) {
+                    _this.clear();
+                }
+                resolve();
+            });
+        });
     };
     /**
     * 更改idle动作的名称.
