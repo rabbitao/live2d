@@ -115,6 +115,9 @@ var LAppDelegate = /** @class */ (function () {
                 _this._captured = true;
                 var posX = e.changedTouches[0].pageX;
                 var posY = e.changedTouches[0].pageY;
+                if (LAppDefine.DebugMode) {
+                    LAppPal.printLog('[APP]canvas touchStart {0}, {1}', posX, posY);
+                }
                 _this._view.onTouchesBegan(posX, posY);
             });
             /*
@@ -172,6 +175,9 @@ var LAppDelegate = /** @class */ (function () {
                 _this._captured = true;
                 var posX = e.pageX;
                 var posY = e.pageY;
+                if (LAppDefine.DebugMode) {
+                    LAppPal.printLog('[APP]canvas mousedown {0}, {1}', posX, posY);
+                }
                 _this._view.onTouchesBegan(posX, posY);
             });
             canvas.addEventListener('mousemove', function (e) {

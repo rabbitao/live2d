@@ -140,7 +140,9 @@ export class LAppDelegate {
 
         const posX = e.changedTouches[0].pageX;
         const posY = e.changedTouches[0].pageY;
-
+        if (LAppDefine.DebugMode) {
+          LAppPal.printLog('[APP]canvas touchStart {0}, {1}', posX, posY);
+        }
         this._view.onTouchesBegan(posX, posY);
       });
       /*
@@ -210,6 +212,9 @@ export class LAppDelegate {
 
         const posX: number = e.pageX;
         const posY: number = e.pageY;
+        if (LAppDefine.DebugMode) {
+          LAppPal.printLog('[APP]canvas mousedown {0}, {1}', posX, posY);
+        }
         this._view.onTouchesBegan(posX, posY);
       });
       canvas.addEventListener('mousemove', (e: MouseEvent) => {

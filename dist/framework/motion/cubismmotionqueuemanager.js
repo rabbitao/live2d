@@ -76,7 +76,7 @@ export var Live2DCubismFramework;
                 motionQueueEntry._motion = motion;
                 _this._motions.clear();
                 _this._motions.pushBack(motionQueueEntry);
-                if (motion._name.split('_')[0] === model._motionIdleName) {
+                if (motion._name.split('_')[0] === model._motionIdleName && motion._weight === LAppDefine.PriorityIdle) {
                     resolve();
                     return;
                 }
