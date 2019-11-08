@@ -454,14 +454,16 @@ export class LAppModel extends CubismUserModel {
   * 更改idle动作的名称.
   */
   public replaceIdleMotion(groupName: string, execImmediately: boolean = true) {
-    if (execImmediately) {
-      this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
-    }
     if (this._motionIdleName === groupName) {
       return;
     }
-    this._motionManager.stopAllMotions();
     this._motionIdleName = groupName;
+    if (execImmediately) {
+      // 需要立即执行动画
+      this._autoIdle = true;
+      // autoidle前提下 停止动作后会自动执行idle动画
+      this._motionManager.stopAllMotions();
+    }
   }
 
   /**
@@ -649,6 +651,7 @@ export class LAppModel extends CubismUserModel {
    * 隐藏模型。
    */
   public disappear(): void {
+    this.stopAllMotions(false);
     this._modelClear = true;
   }
 

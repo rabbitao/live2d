@@ -379,14 +379,16 @@ var LAppModel = /** @class */ (function (_super) {
     */
     LAppModel.prototype.replaceIdleMotion = function (groupName, execImmediately) {
         if (execImmediately === void 0) { execImmediately = true; }
-        if (execImmediately) {
-            this.startRandomMotion(this._motionIdleName, LAppDefine.PriorityIdle);
-        }
         if (this._motionIdleName === groupName) {
             return;
         }
-        this._motionManager.stopAllMotions();
         this._motionIdleName = groupName;
+        if (execImmediately) {
+            // 需要立即执行动画
+            this._autoIdle = true;
+            // autoidle前提下 停止动作后会自动执行idle动画
+            this._motionManager.stopAllMotions();
+        }
     };
     /**
     * 嘴巴进行说话动作.
@@ -548,6 +550,7 @@ var LAppModel = /** @class */ (function (_super) {
      * 隐藏模型。
      */
     LAppModel.prototype.disappear = function () {
+        this.stopAllMotions(false);
         this._modelClear = true;
     };
     /**
