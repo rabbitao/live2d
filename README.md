@@ -32,14 +32,14 @@ public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo',
  * @param modelName: string
  * @return Promise<string>
  */
- public Promise releaseModel(modelName: string)
+ public Promise live2dmanager.releaseModel(modelName: string)
 ```
 
 ``` javascript
 /** 释放全部模型
  * @return Promise<void>
  */
- public Promise releaseAllModel()
+ public Promise live2dmanager.releaseAllModel()
 ```
 
 ## model对象方法
