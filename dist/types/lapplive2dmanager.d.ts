@@ -37,7 +37,11 @@ export declare class LAppLive2DManager {
     /**
      * 释放当前场景中保存的所有模型
      */
-    releaseAllModel(): void;
+    releaseAllModel(): Promise<void>;
+    /**
+     * 释放指定模型
+     */
+    releaseModel(modelName: string): Promise<string>;
     /**
      * 拖动屏幕的时候
      *

@@ -70,11 +70,36 @@ var LAppLive2DManager = /** @class */ (function () {
      * 释放当前场景中保存的所有模型
      */
     LAppLive2DManager.prototype.releaseAllModel = function () {
-        for (var i = 0; i < this._models.getSize(); i++) {
-            this._models.at(i).release();
-            this._models.set(i, null);
-        }
-        this._models.clear();
+        var _this = this;
+        return new Promise(function (resolve) {
+            for (var i = 0; i < _this._models.getSize(); i++) {
+                _this._models.at(i).release();
+                _this._models.set(i, null);
+            }
+            _this._models.clear();
+            resolve();
+        });
+    };
+    /**
+     * 释放指定模型
+     */
+    LAppLive2DManager.prototype.releaseModel = function (modelName) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            if (!modelName) {
+                reject('model [' + modelName + '] not found');
+                return;
+            }
+            for (var ite = _this._models.begin(); ite.notEqual(_this._models.end());) {
+                if (ite.ptr()._modelName === modelName) {
+                    ite.ptr().release();
+                    ite = _this._models.erase(ite);
+                    continue;
+                }
+                ite.preIncrement();
+            }
+            resolve(modelName);
+        });
     };
     /**
      * 拖动屏幕的时候

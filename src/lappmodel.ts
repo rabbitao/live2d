@@ -460,6 +460,7 @@ export class LAppModel extends CubismUserModel {
     this._motionIdleName = groupName;
     if (execImmediately) {
       // 需要立即执行动画
+      this._modelClear = false;
       this._autoIdle = true;
       // autoidle前提下 停止动作后会自动执行idle动画
       this._motionManager.stopAllMotions();

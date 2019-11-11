@@ -8,6 +8,7 @@
 import { Live2DCubismFramework as cubismmatrix44 } from './framework/math/cubismmatrix44';
 import { Live2DCubismFramework as csmvector } from './framework/type/csmvector';
 import Csm_csmVector = csmvector.csmVector;
+import iterator = csmvector.iterator;
 import Csm_CubismMatrix44 = cubismmatrix44.CubismMatrix44;
 
 import { LAppModel } from './lappmodel';
@@ -84,13 +85,36 @@ export class LAppLive2DManager {
   /**
    * 释放当前场景中保存的所有模型
    */
-  public releaseAllModel(): void {
-    for (let i: number = 0; i < this._models.getSize(); i++) {
-      this._models.at(i).release();
-      this._models.set(i, null as any);
-    }
+  public releaseAllModel(): Promise<void> {
+    return new Promise((resolve) => {
+      for (let i: number = 0; i < this._models.getSize(); i++) {
+        this._models.at(i).release();
+        this._models.set(i, null as any);
+      }
+      this._models.clear();
+      resolve();
+    });
+  }
 
-    this._models.clear();
+  /**
+   * 释放指定模型
+   */
+  public releaseModel(modelName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!modelName) {
+        reject('model [' + modelName + '] not found')
+        return
+      }
+      for (let ite: iterator<LAppModel> = this._models.begin(); ite.notEqual(this._models.end());) {
+        if (ite.ptr()._modelName === modelName) {
+          ite.ptr().release();
+          ite = this._models.erase(ite);
+          continue;
+        }
+        ite.preIncrement();
+      }
+      resolve(modelName)
+    })
   }
 
   /**

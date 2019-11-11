@@ -24,7 +24,22 @@ const live2dmanager = live2dInstance.initialize({canvasId: string, width: number
  *                }
  * @return Promise<Model>
  */
-public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo'}).then((model) => {});
+public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo'})
+```
+
+``` javascript
+/** 释放指定模型
+ * @param modelName: string
+ * @return Promise<string>
+ */
+ public Promise releaseModel(modelName: string)
+```
+
+``` javascript
+/** 释放全部模型
+ * @return Promise<void>
+ */
+ public Promise releaseAllModel()
 ```
 
 ## model对象方法
