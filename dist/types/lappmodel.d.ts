@@ -80,6 +80,8 @@ export declare class LAppModel extends CubismUserModel {
      * @param group 运动组名称
      * @param no 组内的数字
      * @param priority 优先级
+     * @param autoIdle 执行完本动画后是否自动执行idle动画
+     * @param autoAppear 模型隐藏时执行动画是否自动显示模型并执行动画
      * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
      */
     startMotion(motionParams?: CubismMotionParam): Promise<CubismUserModel>;

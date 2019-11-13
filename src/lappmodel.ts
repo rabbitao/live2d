@@ -314,12 +314,22 @@ export class LAppModel extends CubismUserModel {
    * @param group 运动组名称
    * @param no 组内的数字
    * @param priority 优先级
+   * @param autoIdle 执行完本动画后是否自动执行idle动画
+   * @param autoAppear 模型隐藏时执行动画是否自动显示模型并执行动画
    * @return 返回已启动的运动的标识号。 用于isFinished（）的参数，用于确定单个动作是否已结束。 无法启动时返回[-1]
    */
-  public startMotion(motionParams: CubismMotionParam = { groupName: '', no: 0, priority: 2, autoIdle: true}): Promise<CubismUserModel> {
-    this._modelClear = false;
+  public startMotion(motionParams: CubismMotionParam = { groupName: '', no: 0, priority: 2, autoIdle: true, autoAppear: true}): Promise<CubismUserModel> {
     motionParams.no = motionParams.no || 0;
     motionParams.priority = motionParams.priority || 2;
+    if (!(Object.prototype.toString.call(motionParams.autoAppear) === '[object Boolean]')) {
+      motionParams.autoAppear = true;
+    }
+    if (!motionParams.autoAppear && this._modelClear) {
+      return new Promise<CubismUserModel>((reslove, reject) => {
+        reject(new Error('[APP]can\'t start motion. If you need to perform animation with the model hidden, set the autoappear property to true'));
+      });
+    }
+    this._modelClear = false;
     if (Object.prototype.toString.call(motionParams.autoIdle) === '[object Boolean]') {
       this._autoIdle = motionParams.autoIdle as boolean;
     } else {
@@ -333,7 +343,7 @@ export class LAppModel extends CubismUserModel {
           LAppPal.printLog('[APP]can\'t start idlePriority motion: {0}_{1}', motionParams.groupName, motionParams.no);
         }
         return new Promise<CubismUserModel>((reslove, reject) => {
-          reject(null);
+          reject(new Error('[APP]can\'t start idlePriority motion'));
         });
       }
       return new Promise<CubismUserModel>((reslove, reject) => {

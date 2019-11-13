@@ -68,13 +68,14 @@ public void disappear()
  *                  no: 动作索引. 当前动作组内如果有多个动画, 执行索引指定的那个. 默认为0
  *                  priority: 动画权重(默认2).
  *                  autoIdle: 动作执行完成后是否自动执行idle. 默认true
+ *                  autoAppear: 在模型隐藏的前提下执行动画, 是否将模型显示出来并执行动画. 默认true
  *                  fadeInTime: 淡入时间, 默认读model3.json配置表
  *                  fadeOutTime: 淡出时间, 默认读model3.json配置表
  *                  callback: 当前动作执行完毕后触发
  *                }
  * @return Promise<Model>
  */
-public Promise startMotion({groupName: string, no?: number, priority?: number, autoIdle?: boolean, fadeInTime?: number, fadeOutTime?: number, callback?: () => void})
+public Promise startMotion({groupName: string, no?: number, priority?: number, autoIdle?: boolean, autoAppear?: boolean, fadeInTime?: number, fadeOutTime?: number, callback?: () => void})
 ```
 
 ``` javascript
