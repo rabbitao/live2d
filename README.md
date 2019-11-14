@@ -98,10 +98,13 @@ public Promise startMotionQueue([{groupName: string, no?: number, priority?: num
   
 ``` javascript
 /** 停止全部动作
- * @param clear: 停止动作后是否清除画板. (默认false. 停止动画后会执行idle, 没有idle时画布会保留当前动画的最后一帧)
+ * @param object {
+ *   clear: 停止动作后是否清除画板. (默认false)
+ *   autoIdle: 停止动作后是否执行idle动画 不执行会停留在当前动画最后一帧. 默认true
+ * }
  * @return Promise<void>
  */
-public Promise stopAllMotions(clear?: boolean)
+public Promise stopAllMotions({clear?: boolean, autoIdle?: boolean})
 ```
 
 ``` javascript

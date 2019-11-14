@@ -100,7 +100,10 @@ export declare class LAppModel extends CubismUserModel {
      * 停止所有动作 清除动作队列 已执行的动作如果有回调函数依旧会执行.
      * @Param clear 是否清除画布内容
      */
-    stopAllMotions(clear: boolean): Promise<void>;
+    stopAllMotions(args?: {
+        clear?: boolean;
+        autoIdle?: boolean;
+    }): Promise<void>;
     /**
     * 更改idle动作的名称.
     */
@@ -161,6 +164,12 @@ export declare class LAppModel extends CubismUserModel {
      * 模型显示状态。
      */
     getVisible(): boolean;
+    getProperty(): {
+        visible: boolean;
+        autoIdle: boolean;
+        mouthOpen: boolean;
+        idleMotion: string;
+    };
     /**
      * 释放所有运动数据。
      */

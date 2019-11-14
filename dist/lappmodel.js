@@ -371,14 +371,20 @@ var LAppModel = /** @class */ (function (_super) {
      * 停止所有动作 清除动作队列 已执行的动作如果有回调函数依旧会执行.
      * @Param clear 是否清除画布内容
      */
-    LAppModel.prototype.stopAllMotions = function (clear) {
+    LAppModel.prototype.stopAllMotions = function (args) {
         var _this = this;
         return new Promise(function (resolve) {
             _this._motionQueue = [];
             _this._mouthOpen = false;
             _this._motionManager.stopAllMotions().then(function () {
-                if (clear) {
+                if (args.clear) {
                     _this.clear();
+                }
+                if (Object.prototype.toString.call(args.autoIdle) === '[object boolean]') {
+                    _this._autoIdle = args.autoIdle;
+                }
+                else {
+                    _this._autoIdle = true;
                 }
                 resolve();
             });
@@ -561,14 +567,21 @@ var LAppModel = /** @class */ (function (_super) {
      * 隐藏模型。
      */
     LAppModel.prototype.disappear = function () {
-        this.stopAllMotions(false);
-        this._modelClear = true;
+        this.stopAllMotions({ clear: true });
     };
     /**
      * 模型显示状态。
      */
     LAppModel.prototype.getVisible = function () {
         return !this._modelClear;
+    };
+    LAppModel.prototype.getProperty = function () {
+        return {
+            visible: !this._modelClear,
+            autoIdle: this._autoIdle,
+            mouthOpen: this._mouthOpen,
+            idleMotion: this._motionIdleName
+        };
     };
     /**
      * 释放所有运动数据。
