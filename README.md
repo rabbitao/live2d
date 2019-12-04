@@ -155,7 +155,7 @@ public void mouthClose()
  *  @param pointX x坐标
  *  @param pointY y坐标
  *  注: 坐标是以模型原点为(0,0)点, 进行象限分布
- *  例: 看向左下(第三象限) 坐标可为(-500, -500)
+ *  取值范围±1 例: lootAt(-0.02, 0.1)
  */
 public void lookAt(pointX: number, pointY: number)
 ```

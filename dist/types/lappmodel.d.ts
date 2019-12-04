@@ -114,7 +114,7 @@ export declare class LAppModel extends CubismUserModel {
     mouthOpen(speed: any): void;
     mouthClose(): void;
     /**
-    * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布.
+    * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布, 取值范围±1.
     */
     lookAt(pointX: number, pointY: number): void;
     /**

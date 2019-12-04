@@ -377,10 +377,10 @@ var LAppModel = /** @class */ (function (_super) {
             _this._motionQueue = [];
             _this._mouthOpen = false;
             _this._motionManager.stopAllMotions().then(function () {
-                if (args.clear) {
+                if (args && args.clear) {
                     _this.clear();
                 }
-                if (Object.prototype.toString.call(args.autoIdle) === '[object boolean]') {
+                if (args && Object.prototype.toString.call(args.autoIdle) === '[object boolean]') {
                     _this._autoIdle = args.autoIdle;
                 }
                 else {
@@ -421,13 +421,31 @@ var LAppModel = /** @class */ (function (_super) {
         this._mouthOpen = false;
     };
     /**
-    * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布.
+    * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布, 取值范围±1.
     */
     LAppModel.prototype.lookAt = function (pointX, pointY) {
-        var rect = canvas.getBoundingClientRect();
-        var posX = pointX - rect.left;
-        var posY = pointY - rect.top;
-        this._dragManager.set(posX, posY);
+        if (isNaN(parseFloat(pointX)) || isNaN(parseFloat(pointY))) {
+            throw new TypeError('lookAt(pointX: number, pointY: number) 参数类型错误');
+        }
+        if (Object.prototype.toString.call(pointX) !== '[object Number]') {
+            pointX = parseFloat(pointX);
+        }
+        if (Object.prototype.toString.call(pointY) !== '[object Number]') {
+            pointX = parseFloat(pointY);
+        }
+        if (pointX > 1) {
+            pointX = 1;
+        }
+        else if (pointX < -1) {
+            pointX = -1;
+        }
+        if (pointY > 1) {
+            pointY = 1;
+        }
+        else if (pointY < -1) {
+            pointY = -1;
+        }
+        this._dragManager.set(pointX, pointY);
     };
     /**
      * 设置参数指定的面部表情运动

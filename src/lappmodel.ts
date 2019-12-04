@@ -452,10 +452,10 @@ export class LAppModel extends CubismUserModel {
       this._motionQueue = [];
       this._mouthOpen = false;
       this._motionManager.stopAllMotions().then(() => {
-        if (args.clear) {
+        if (args && args.clear) {
           this.clear();
         }
-        if (Object.prototype.toString.call(args.autoIdle) === '[object boolean]') {
+        if (args && Object.prototype.toString.call(args.autoIdle) === '[object boolean]') {
           this._autoIdle = args.autoIdle;
         } else {
           this._autoIdle = true
@@ -498,14 +498,29 @@ export class LAppModel extends CubismUserModel {
   }
 
   /**
-  * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布.
+  * 眼睛注视某个坐标点. 坐标以模型原点为(0,0)点进行象限分布, 取值范围±1.
   */
   public lookAt(pointX: number, pointY: number) {
-
-    const rect = canvas.getBoundingClientRect();
-    const posX = pointX - rect.left;
-    const posY = pointY - rect.top;
-    this._dragManager.set(posX, posY);
+    if (isNaN(parseFloat(pointX as any)) || isNaN(parseFloat(pointY as any))) {
+      throw new TypeError('lookAt(pointX: number, pointY: number) 参数类型错误');
+    }
+    if (Object.prototype.toString.call(pointX) !== '[object Number]') {
+      pointX = parseFloat(pointX as any);
+    }
+    if (Object.prototype.toString.call(pointY) !== '[object Number]') {
+      pointX = parseFloat(pointY as any);
+    }
+    if (pointX > 1) {
+      pointX = 1;
+    } else if (pointX < -1) {
+      pointX = -1;
+    }
+    if (pointY > 1) {
+      pointY = 1;
+    } else if (pointY < -1) {
+      pointY = -1;
+    }
+    this._dragManager.set(pointX, pointY);
   }
 
   /**
