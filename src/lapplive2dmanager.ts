@@ -200,7 +200,7 @@ export class LAppLive2DManager {
    * 切换场景
    * 在示例应用程序中，切换模型集。
    */
-  public addModel(resource: { path: string, fileName: string, modelName: string }): Promise<LAppModel | null> {
+  public addModel(resource: { path: string, fileName: string, modelName: string }, batchLoad?: boolean): Promise<LAppModel | null> {
     return new Promise((resolve) => {
       if (LAppDefine.DebugLogEnable) {
         LAppPal.printLog('[APP]model {0}', resource.modelName);
@@ -214,6 +214,7 @@ export class LAppLive2DManager {
       }
       let newModel = new LAppModel(resource);
       this._models.pushBack(newModel);
+      newModel._batchLoad = (typeof (batchLoad) === 'boolean') ? batchLoad : false
       newModel.loadAssets(resource.path, modelFileName, resource.fileName).then(() => {
         resolve(newModel);
       }).catch(() => {

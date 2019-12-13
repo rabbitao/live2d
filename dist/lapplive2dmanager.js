@@ -178,7 +178,7 @@ var LAppLive2DManager = /** @class */ (function () {
      * 切换场景
      * 在示例应用程序中，切换模型集。
      */
-    LAppLive2DManager.prototype.addModel = function (resource) {
+    LAppLive2DManager.prototype.addModel = function (resource, batchLoad) {
         var _this = this;
         return new Promise(function (resolve) {
             if (LAppDefine.DebugLogEnable) {
@@ -192,6 +192,7 @@ var LAppLive2DManager = /** @class */ (function () {
             }
             var newModel = new LAppModel(resource);
             _this._models.pushBack(newModel);
+            newModel._batchLoad = (typeof (batchLoad) === 'boolean') ? batchLoad : false;
             newModel.loadAssets(resource.path, modelFileName, resource.fileName).then(function () {
                 resolve(newModel);
             }).catch(function () {

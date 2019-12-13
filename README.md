@@ -22,9 +22,10 @@ const live2dmanager = live2dInstance.initialize({canvasId: string, width: number
  *                  modelName: string,  // 模型名称,
  *                  textures?: string[] // 纹理名称数组(为空则加载全部纹理)
  *                }
+ * @param batchLoad: boolean // 是否启用按需加载模型动画资源. (动画较多时建议启用. 初始化只加载前5个动画资源. 后续动画在使用时加载)
  * @return Promise<Model>
  */
-public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo'})
+public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo'}, batchLoad)
 ```
 
 ``` javascript

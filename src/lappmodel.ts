@@ -123,6 +123,7 @@ export class LAppModel extends CubismUserModel {
   public _mouthParamY: Array<number>; // 嘴巴动态数组
   public _mouthOpenIndex: number; // 嘴巴动态数组索引
   public _autoIdle: boolean; // 是否在动作结束后自动执行idle
+  public _batchLoad: boolean; // 是否分批加载动作文件
 
   /**
    * 构造函数
@@ -162,6 +163,7 @@ export class LAppModel extends CubismUserModel {
     this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
     this._modelTextures = [];
     this._autoIdle = true;
+    this._batchLoad = false;
   }
 
   /**
@@ -362,7 +364,7 @@ export class LAppModel extends CubismUserModel {
       let path: string = fileName;
       path = this._modelHomeDir + path;
 
-      this.fetchFile(path, 'arraybuffer').then(
+      return this.fetchFile(path, 'arraybuffer').then(
         (response) => {
           return response.arrayBuffer();
         },
@@ -387,19 +389,24 @@ export class LAppModel extends CubismUserModel {
           autoDelete = true;  // 完成后从内存中删除
 
           deleteBuffer(buffer, path);
-        },
-      );
-    }
-
-    if (LAppDefine.DebugMode) {
-      LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
-    }
-    if (motion == null) {
-      return new Promise<CubismUserModel>((reslove, reject) => {
-        reject(new Error('没有可执行的motion'));
+          this._allMotionCount++;
+          if (LAppDefine.DebugMode) {
+            LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
+          }
+          return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
+        }
+      ).catch(() => {
+        this._motionManager.setReservePriority(0);
+        return new Promise<CubismUserModel>((reslove, reject) => {
+          reject(new Error('没有可执行的motion'));
+        });
       });
+    } else {
+      if (LAppDefine.DebugMode) {
+        LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
+      }
+      return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
     }
-    return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
   }
 
   /**
@@ -1072,16 +1079,18 @@ export class LAppModel extends CubismUserModel {
         this._motionCount = 0;
         const group: string[] = [];
 
+        // 找出动作的总数
         const motionGroupCount: number = this._modelSetting.getMotionGroupCount();
 
-        // 找出动作的总数
-        for (let i: number = 0; i < motionGroupCount; i++) {
+        // 如果启用了分批加载动作资源  则初始化时只加载前5个动作
+        const maxLoadMotionCount = motionGroupCount > 5 ? (this._batchLoad ? 5 : motionGroupCount) : motionGroupCount;
+        for (let i: number = 0; i < maxLoadMotionCount; i++) {
           group[i] = this._modelSetting.getMotionGroupName(i);
           this._allMotionCount += this._modelSetting.getMotionCount(group[i]);
         }
 
         // 加载动作
-        for (let i: number = 0; i < motionGroupCount; i++) {
+        for (let i: number = 0; i < maxLoadMotionCount; i++) {
           this.preLoadMotionGroup(group[i]);
         }
 
@@ -1102,6 +1111,60 @@ export class LAppModel extends CubismUserModel {
         resolve(true);
       };
     });
+  }
+
+  /**
+   * asyncLoadMotionGroup
+   */
+  public asyncLoadMotionGroup(motionGroups: Array<string>) {
+    this._model.saveParameters();
+    for (let group of motionGroups) {
+      this._allMotionCount += this._modelSetting.getMotionCount(group);
+      
+      for (let i: number = 0; i < this._modelSetting.getMotionCount(group); i++) {
+        const name: string = CubismString.getFormatedString('{0}_{1}', group, i);
+        let path = this._modelSetting.getMotionFileName(group, i);
+        path = this._modelHomeDir + path;
+
+        if (LAppDefine.DebugMode) {
+          LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
+        }
+
+        this.fetchFile(path, 'arraybuffer').then(
+          (response) => {
+            return response.arrayBuffer();
+          },
+        ).then(
+          (arrayBuffer) => {
+            const buffer: ArrayBuffer = arrayBuffer;
+            const size = buffer.byteLength;
+            const priority = name.split('_')[0] === this._motionIdleName ? LAppDefine.PriorityIdle : LAppDefine.PriorityNormal;
+            const tmpMotion: CubismMotion = this.loadMotion(buffer, size, name, priority) as CubismMotion;
+
+            let fadeTime = this._modelSetting.getMotionFadeInTimeValue(group, i);
+            if (fadeTime >= 0.0) {
+              tmpMotion.setFadeInTime(fadeTime);
+            }
+
+            fadeTime = this._modelSetting.getMotionFadeOutTimeValue(group, i);
+            if (fadeTime >= 0.0) {
+              tmpMotion.setFadeOutTime(fadeTime);
+            }
+            tmpMotion.setEffectIds(this._eyeBlinkIds, this._lipSyncIds);
+
+            if (this._motions.getValue(name) != null) {
+              ACubismMotion.delete(this._motions.getValue(name));
+            }
+
+            this._motions.setValue(name, tmpMotion);
+
+            deleteBuffer(buffer, path);
+
+            this._motionCount++;
+          }
+        );
+      }
+    }
   }
 
   /**

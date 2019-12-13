@@ -116,6 +116,7 @@ var LAppModel = /** @class */ (function (_super) {
         _this._mouthParamY = [0, 0, 0, 0, 0, 1, 0, 0.03, 0.05, 0.2, 0.35, 0.42, 0.49, 0.38, 0.27, 0.42, 0.56, 0.584, 0.604, 0.51, 0.41, 0.23, 0.05, 0.35, 0.64, 0.5, 0.36, 0.365, 0.369, 0.373, 0.376, 0.51, 0.64, 0.54, 0.44, 0.34, 0.24, 0.34, 0.44, 0.425, 0.412, 0.398, 0.384, 0.44, 0.49, 0.37, 0.25, 0.12, 0, 0, 0, 0, 0];
         _this._modelTextures = [];
         _this._autoIdle = true;
+        _this._batchLoad = false;
         return _this;
     }
     /**
@@ -296,7 +297,7 @@ var LAppModel = /** @class */ (function (_super) {
         if (motion == null) {
             var path_1 = fileName;
             path_1 = this._modelHomeDir + path_1;
-            this.fetchFile(path_1, 'arraybuffer').then(function (response) {
+            return this.fetchFile(path_1, 'arraybuffer').then(function (response) {
                 return response.arrayBuffer();
             }).then(function (arrayBuffer) {
                 var buffer = arrayBuffer;
@@ -313,17 +314,24 @@ var LAppModel = /** @class */ (function (_super) {
                 motion.setEffectIds(_this._eyeBlinkIds, _this._lipSyncIds);
                 autoDelete = true; // 完成后从内存中删除
                 deleteBuffer(buffer, path_1);
+                _this._allMotionCount++;
+                if (LAppDefine.DebugMode) {
+                    LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
+                }
+                return _this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, _this, motionParams.callback);
+            }).catch(function () {
+                _this._motionManager.setReservePriority(0);
+                return new Promise(function (reslove, reject) {
+                    reject(new Error('没有可执行的motion'));
+                });
             });
         }
-        if (LAppDefine.DebugMode) {
-            LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
+        else {
+            if (LAppDefine.DebugMode) {
+                LAppPal.printLog('[APP]start motion: {0}_{1}', motionParams.groupName, motionParams.no);
+            }
+            return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
         }
-        if (motion == null) {
-            return new Promise(function (reslove, reject) {
-                reject(new Error('没有可执行的motion'));
-            });
-        }
-        return this._motionManager.startMotionPriority(motion, autoDelete, motionParams.priority, this, motionParams.callback);
     };
     /**
      * 开始播放随机选择的动作。
@@ -897,14 +905,16 @@ var LAppModel = /** @class */ (function (_super) {
                 _this._allMotionCount = 0;
                 _this._motionCount = 0;
                 var group = [];
-                var motionGroupCount = _this._modelSetting.getMotionGroupCount();
                 // 找出动作的总数
-                for (var i = 0; i < motionGroupCount; i++) {
+                var motionGroupCount = _this._modelSetting.getMotionGroupCount();
+                // 如果启用了分批加载动作资源  则初始化时只加载前5个动作
+                var maxLoadMotionCount = motionGroupCount > 5 ? (_this._batchLoad ? 5 : motionGroupCount) : motionGroupCount;
+                for (var i = 0; i < maxLoadMotionCount; i++) {
                     group[i] = _this._modelSetting.getMotionGroupName(i);
                     _this._allMotionCount += _this._modelSetting.getMotionCount(group[i]);
                 }
                 // 加载动作
-                for (var i = 0; i < motionGroupCount; i++) {
+                for (var i = 0; i < maxLoadMotionCount; i++) {
                     _this.preLoadMotionGroup(group[i]);
                 }
                 // 没有动作的时候
@@ -923,6 +933,55 @@ var LAppModel = /** @class */ (function (_super) {
         });
     };
     /**
+     * asyncLoadMotionGroup
+     */
+    LAppModel.prototype.asyncLoadMotionGroup = function (motionGroups) {
+        var _this = this;
+        this._model.saveParameters();
+        var _loop_3 = function (group) {
+            this_2._allMotionCount += this_2._modelSetting.getMotionCount(group);
+            var _loop_4 = function (i) {
+                var name_4 = CubismString.getFormatedString('{0}_{1}', group, i);
+                var path = this_2._modelSetting.getMotionFileName(group, i);
+                path = this_2._modelHomeDir + path;
+                if (LAppDefine.DebugMode) {
+                    LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
+                }
+                this_2.fetchFile(path, 'arraybuffer').then(function (response) {
+                    return response.arrayBuffer();
+                }).then(function (arrayBuffer) {
+                    var buffer = arrayBuffer;
+                    var size = buffer.byteLength;
+                    var priority = name_4.split('_')[0] === _this._motionIdleName ? LAppDefine.PriorityIdle : LAppDefine.PriorityNormal;
+                    var tmpMotion = _this.loadMotion(buffer, size, name_4, priority);
+                    var fadeTime = _this._modelSetting.getMotionFadeInTimeValue(group, i);
+                    if (fadeTime >= 0.0) {
+                        tmpMotion.setFadeInTime(fadeTime);
+                    }
+                    fadeTime = _this._modelSetting.getMotionFadeOutTimeValue(group, i);
+                    if (fadeTime >= 0.0) {
+                        tmpMotion.setFadeOutTime(fadeTime);
+                    }
+                    tmpMotion.setEffectIds(_this._eyeBlinkIds, _this._lipSyncIds);
+                    if (_this._motions.getValue(name_4) != null) {
+                        ACubismMotion.delete(_this._motions.getValue(name_4));
+                    }
+                    _this._motions.setValue(name_4, tmpMotion);
+                    deleteBuffer(buffer, path);
+                    _this._motionCount++;
+                });
+            };
+            for (var i = 0; i < this_2._modelSetting.getMotionCount(group); i++) {
+                _loop_4(i);
+            }
+        };
+        var this_2 = this;
+        for (var _i = 0, motionGroups_1 = motionGroups; _i < motionGroups_1.length; _i++) {
+            var group = motionGroups_1[_i];
+            _loop_3(group);
+        }
+    };
+    /**
      * 将纹理加载到纹理单元中
      */
     LAppModel.prototype.setupTextures = function () {
@@ -932,22 +991,22 @@ var LAppModel = /** @class */ (function (_super) {
         if (this._state == LoadStep.LoadTexture) {
             // 用于纹理阅读
             var textureCount_1 = this._modelSetting.getTextureCount();
-            var _loop_3 = function (modelTextureNumber) {
-                var modelTextureName = this_2._modelSetting.getTextureFileName(modelTextureNumber);
+            var _loop_5 = function (modelTextureNumber) {
+                var modelTextureName = this_3._modelSetting.getTextureFileName(modelTextureNumber);
                 // 如果纹理名称是空字符，请跳过加载/绑定过程
                 if (modelTextureName == '') {
                     LAppPal.printLog('[APP]getTextureFileName null');
                     return "continue";
                 }
                 // 如果用户指定了纹理名称 则只加载用户指定的纹理
-                if (this_2._modelTextures.length > 0) {
-                    if (!this_2._modelTextures.includes(modelTextureName)) {
+                if (this_3._modelTextures.length > 0) {
+                    if (!this_3._modelTextures.includes(modelTextureName)) {
                         return "continue";
                     }
                 }
                 // 将纹理加载到WebGL纹理单元中
                 var texturePath = modelTextureName;
-                texturePath = this_2._modelHomeDir + texturePath;
+                texturePath = this_3._modelHomeDir + texturePath;
                 // 加载完成后调用的回调函数
                 var onLoad = function (textureInfo) {
                     _this.getRenderer().bindTexture(modelTextureNumber, textureInfo.id);
@@ -959,11 +1018,11 @@ var LAppModel = /** @class */ (function (_super) {
                 };
                 // 阅读
                 LAppDelegate.getInstance().getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
-                this_2.getRenderer().setIsPremultipliedAlpha(usePremultiply);
+                this_3.getRenderer().setIsPremultipliedAlpha(usePremultiply);
             };
-            var this_2 = this;
+            var this_3 = this;
             for (var modelTextureNumber = 0; modelTextureNumber < textureCount_1; modelTextureNumber++) {
-                _loop_3(modelTextureNumber);
+                _loop_5(modelTextureNumber);
             }
             this._state = LoadStep.WaitLoadTexture;
         }

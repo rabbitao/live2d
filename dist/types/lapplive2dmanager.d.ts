@@ -69,6 +69,6 @@ export declare class LAppLive2DManager {
         path: string;
         fileName: string;
         modelName: string;
-    }): Promise<LAppModel | null>;
+    }, batchLoad?: boolean): Promise<LAppModel | null>;
     setDebugMode(mode: boolean): void;
 }

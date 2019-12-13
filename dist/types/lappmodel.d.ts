@@ -54,6 +54,7 @@ export declare class LAppModel extends CubismUserModel {
     _mouthParamY: Array<number>;
     _mouthOpenIndex: number;
     _autoIdle: boolean;
+    _batchLoad: boolean;
     /**
      * 构造函数
      */
@@ -202,6 +203,10 @@ export declare class LAppModel extends CubismUserModel {
      * @param setting ICubismModelSetting的一个实例
      */
     private setupModel;
+    /**
+     * asyncLoadMotionGroup
+     */
+    asyncLoadMotionGroup(motionGroups: Array<string>): void;
     /**
      * 将纹理加载到纹理单元中
      */
