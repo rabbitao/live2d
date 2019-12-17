@@ -312,7 +312,17 @@ var LAppModel = /** @class */ (function (_super) {
                     motion.setFadeOutTime(fadeTime);
                 }
                 motion.setEffectIds(_this._eyeBlinkIds, _this._lipSyncIds);
-                autoDelete = true; // 完成后从内存中删除
+                if (_this._batchLoad) {
+                    // 启用分批次加载时 执行动画前保存动画资源 动画执行完不从内存中删除
+                    if (_this._motions.getValue(name) != null) {
+                        ACubismMotion.delete(_this._motions.getValue(name));
+                    }
+                    _this._motions.setValue(name, motion);
+                }
+                else {
+                    // 正常使用预加载流程时  走到这里的动画都是临时动画 执行完毕需要从内存中删除释放资源
+                    autoDelete = true; // 完成后从内存中删除
+                }
                 deleteBuffer(buffer, path_1);
                 _this._allMotionCount++;
                 if (LAppDefine.DebugMode) {

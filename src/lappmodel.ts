@@ -386,7 +386,17 @@ export class LAppModel extends CubismUserModel {
           }
 
           motion.setEffectIds(this._eyeBlinkIds, this._lipSyncIds);
-          autoDelete = true;  // 完成后从内存中删除
+          if (this._batchLoad) {
+            // 启用分批次加载时 执行动画前保存动画资源 动画执行完不从内存中删除
+            if (this._motions.getValue(name) != null) {
+              ACubismMotion.delete(this._motions.getValue(name));
+            }
+
+            this._motions.setValue(name, motion);
+          } else {
+            // 正常使用预加载流程时  走到这里的动画都是临时动画 执行完毕需要从内存中删除释放资源
+            autoDelete = true;  // 完成后从内存中删除
+          }
 
           deleteBuffer(buffer, path);
           this._allMotionCount++;
