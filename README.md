@@ -168,6 +168,14 @@ public void lookAt(pointX: number, pointY: number)
  */
 public boolean getVisible()
 ```
+
+``` javascript
+/** 
+ *  获取模型当前状态
+ *  @return {visible: boolean, autoIdle: boolean, mouthOpen: boolean, idleMotion: string}
+ */
+public object getProperty()
+```
   
 ## Project setup
 ```

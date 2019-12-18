@@ -709,6 +709,9 @@ export class LAppModel extends CubismUserModel {
     return !this._modelClear;
   }
 
+  /**
+   * 获取模型当前状态。
+   */
   public getProperty(): { visible: boolean, autoIdle: boolean, mouthOpen: boolean, idleMotion: string} {
     return {
       visible: !this._modelClear,
