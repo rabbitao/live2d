@@ -6,26 +6,29 @@ or
 $ npm install find-live2d3
 ```
 ## 初始化
-``` javascript
+``` typescript
 import live2d from 'find-live2d3'
 /** 初始化live2d
- * @param object: {canvasId: string, width: number, height:number} 画布的id及大小
+ * @param renderConfig?: { efficient: boolean, // 是否使用全效能模式
+ *  fps?: number // 不使用全效模式事, 手动设置帧率. 默认60
+ * }
  */
 let live2dInstance = new live2D()
-const live2dmanager = live2dInstance.initialize({canvasId: string, width: number, height:number})
+const live2dmanager = live2dInstance.initialize(renderConfig?: { efficient: boolean, fps?: number})
 ```
 
-``` javascript
+``` typescript
 /** 添加模型
  * @param object: { path: string, // 模型资源路径, 
  *                  fileName: string    // 模型文件名称(.model3.json之前)
  *                  modelName: string,  // 模型名称,
+ *                  modelSize: number, // 模型大小
  *                  textures?: string[] // 纹理名称数组(为空则加载全部纹理)
  *                }
  * @param batchLoad: boolean // 是否启用按需加载模型动画资源. (动画较多时建议启用. 初始化只加载前5个动画资源. 后续动画在使用时加载)
  * @return Promise<Model>
  */
-public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo'}, batchLoad)
+public Promise live2dmanager.addModel({path: '/resource/momo/', fileName:'momo', modelName: 'momo', modelSize?: 1000}, batchLoad)
 ```
 
 ``` javascript

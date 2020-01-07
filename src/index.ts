@@ -4,14 +4,12 @@ import { LAppLive2DManager } from './lapplive2dmanager';
 
 class live2d {
   private live2dmanager: LAppLive2DManager | null = null;
-  public initialize(config: { canvasId: string, width: number, height: number }): LAppLive2DManager | null {
-    let lappdelegate = LAppDelegate.getInstance();
-    if (lappdelegate.initialize(config) == false) {
-      return null;
-    }
+  public initialize(renderConfig?: { efficient: boolean, fps?: number}): LAppLive2DManager | null {
     this.live2dmanager = LAppLive2DManager.getInstance();
-    lappdelegate.run();
-    return this.live2dmanager;
+    if(this.live2dmanager.initDelegate(renderConfig)) {
+      return this.live2dmanager;
+    }
+    throw new Error('live2d core 初始化失败');
   }
 
   public release() {

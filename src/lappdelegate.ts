@@ -57,6 +57,8 @@ export class LAppDelegate {
   public _mouseY: number;                    // 鼠标Y坐标
   public _isEnd: boolean;                    // APP终止了吗
   public _textureManager: LAppTextureManager; // 纹理管理
+  public _renderThreadId: number;
+  public _renderStatus: boolean;
 
   /**
    * 构造函数
@@ -66,6 +68,8 @@ export class LAppDelegate {
     this._mouseX = 0.0;
     this._mouseY = 0.0;
     this._isEnd = false;
+    this._renderThreadId = 0;
+    this._renderStatus = false;
 
     this._cubismOption = new Csm_Option();
     this._view = new LAppView();
@@ -75,32 +79,32 @@ export class LAppDelegate {
   /**
    * 初始化您需要的APP。
    */
-  public initialize(config: { canvasId: string, width: number, height: number }): boolean {
-    config.canvasId = config.canvasId || 'live2d-core-canvas';
-    config.width = config.width || 1000;
-    config.height = config.height || 800;
+  public initialize(): boolean {
+    const canvasId = 'live2d-core-canvas';
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     // 创建html元素
     let wrap = document.getElementById('live2d-core-wrap');
     if (!wrap) {
       wrap = document.createElement('div');
       wrap.id = 'live2d-core-wrap';
-      wrap.style.position = 'absolute';
+      wrap.style.position = 'fixed';
       wrap.style.width = '100%';
       wrap.style.height = '100%';
       wrap.style.top = '0px';
       wrap.style.left = '0px';
       document.body.appendChild(wrap);
     }
-    canvas = document.getElementById(config.canvasId) as HTMLCanvasElement;
+    canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!canvas) {
       canvas = document.createElement('canvas');
-      canvas.id = config.canvasId;
-      canvas.style.position = 'absolute';
+      canvas.id = canvasId;
+      canvas.style.position = 'fixed';
       canvas.style.left = '0px';
       canvas.style.top = '0px';
       canvas.style.zIndex = '100';
-      canvas.setAttribute('width', config.width.toString());
-      canvas.setAttribute('height', config.height.toString());
+      canvas.setAttribute('width', width.toString());
+      canvas.setAttribute('height', height.toString());
       (document.getElementById('live2d-core-wrap') as HTMLDivElement).appendChild(canvas);
     }
 
@@ -276,9 +280,13 @@ export class LAppDelegate {
   /**
    * 执行过程。
    */
-  public run(): void {
+  public startRender(param?: { efficient: boolean, fps?: number}): void {
+    if (this._renderStatus) {
+      return;
+    }
     // 主循环
     const loop = () => {
+      this._renderStatus = true;
       // 检查实例
       if (s_instance == null) {
         return;
@@ -309,9 +317,28 @@ export class LAppDelegate {
       this._view.render();
 
       // 递归调用循环
-      requestAnimationFrame(loop);
+      if (Object.prototype.toString.call(param) === '[object Object]' && param) {
+        if (param.efficient) {
+          this._renderThreadId = requestAnimationFrame(loop);
+        } else {
+          const fps = param.fps ? param.fps : 60;
+          this._renderThreadId = window.setTimeout(() => {
+            loop();
+          }, 1000 / fps);
+        }
+      } else {
+        this._renderThreadId = requestAnimationFrame(loop);
+      }
     };
     loop();
+  }
+
+  public stopRender(): void {
+    if (!this._renderStatus) {
+      return;
+    }
+    window.cancelAnimationFrame(this._renderThreadId);
+    this._renderStatus = false;
   }
 
   /**

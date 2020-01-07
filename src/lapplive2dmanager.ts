@@ -14,7 +14,7 @@ import Csm_CubismMatrix44 = cubismmatrix44.CubismMatrix44;
 import { LAppModel } from './lappmodel';
 import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
-import { canvas } from './lappdelegate';
+import { canvas, LAppDelegate } from './lappdelegate';
 
 
 export let s_instance: LAppLive2DManager = null as any;
@@ -52,6 +52,7 @@ export class LAppLive2DManager {
   public _viewMatrix: Csm_CubismMatrix44;    // 用于模型绘制的视图矩阵
   public _models: Csm_csmVector<LAppModel>;  // 模型实例容器
   public _userModels: LAppModel[]; // 外部使用的model数组
+  public delegate: LAppDelegate;
 
   /**
    * 构造函数
@@ -60,6 +61,15 @@ export class LAppLive2DManager {
     this._viewMatrix = new Csm_CubismMatrix44();
     this._models = new Csm_csmVector<LAppModel>();
     this._userModels = [];
+    this.delegate = LAppDelegate.getInstance();
+  }
+
+  public initDelegate(renderConfig?: { efficient: boolean, fps?: number }): boolean {
+    if (this.delegate.initialize() == false) {
+      return false;
+    }
+    this.delegate.startRender(renderConfig);
+    return true;
   }
 
   /**
@@ -102,8 +112,8 @@ export class LAppLive2DManager {
   public releaseModel(modelName: string): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!modelName) {
-        reject('model [' + modelName + '] not found')
-        return
+        reject('model [' + modelName + '] not found');
+        return;
       }
       for (let ite: iterator<LAppModel> = this._models.begin(); ite.notEqual(this._models.end());) {
         if (ite.ptr()._modelName === modelName) {
@@ -113,8 +123,8 @@ export class LAppLive2DManager {
         }
         ite.preIncrement();
       }
-      resolve(modelName)
-    })
+      resolve(modelName);
+    });
   }
 
   /**
@@ -175,22 +185,16 @@ export class LAppLive2DManager {
   public onUpdate(): void {
     let projection: Csm_CubismMatrix44 = new Csm_CubismMatrix44();
 
-    let width: number, height: number;
-    width = canvas.width;
-    height = canvas.height;
-    projection.scale(1.0, width / height);
-
     if (this._viewMatrix != null) {
       projection.multiplyByMatrix(this._viewMatrix);
     }
-
+    
     const saveProjection: Csm_CubismMatrix44 = projection.clone();
     const modelCount: number = this._models.getSize();
 
     for (let i: number = 0; i < modelCount; ++i) {
       const model: LAppModel = this.getModel(i);
       projection = saveProjection.clone();
-
       model.update();
       model.draw(projection); // 投影更改，因为它是通过引用传递的。
     }
@@ -200,7 +204,7 @@ export class LAppLive2DManager {
    * 切换场景
    * 在示例应用程序中，切换模型集。
    */
-  public addModel(resource: { path: string, fileName: string, modelName: string }, batchLoad?: boolean): Promise<LAppModel | null> {
+  public addModel(resource: { path: string, fileName: string, modelName: string, modelSize: number, textures: string[] }, batchLoad?: boolean): Promise<LAppModel | null> {
     return new Promise((resolve) => {
       if (LAppDefine.DebugLogEnable) {
         LAppPal.printLog('[APP]model {0}', resource.modelName);
@@ -212,10 +216,10 @@ export class LAppLive2DManager {
       if (mdl) {
         resolve(mdl);
       }
-      let newModel = new LAppModel(resource);
+      let newModel = new LAppModel(resource, this.delegate);
       this._models.pushBack(newModel);
-      newModel._batchLoad = (typeof (batchLoad) === 'boolean') ? batchLoad : false
-      newModel.loadAssets(resource.path, modelFileName, resource.fileName).then(() => {
+      newModel._batchLoad = (typeof (batchLoad) === 'boolean') ? batchLoad : false;
+      newModel.loadAssets(resource.path, modelFileName, resource.fileName, resource.textures).then(() => {
         resolve(newModel);
       }).catch(() => {
         resolve(null);
@@ -224,6 +228,6 @@ export class LAppLive2DManager {
   }
 
   public setDebugMode(mode: boolean) {
-    LAppDefine.DebugMode = mode
+    LAppDefine.DebugMode = mode;
   }
 }
