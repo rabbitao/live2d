@@ -784,7 +784,7 @@ export class LAppModel extends CubismUserModel {
     } else {
       matrix.scale(1, width / height);
     }
-    
+
     matrix.translate(this._delegate.getView().transformScreenX(this._modelPositionX), this._delegate.getView().transformScreenY(this._modelPositionY));
     // 每次阅读后
     if (this._state == LoadStep.CompleteSetup) {
@@ -1204,8 +1204,7 @@ export class LAppModel extends CubismUserModel {
     if (this._state == LoadStep.LoadTexture) {
       // 用于纹理阅读
       const textureCount: number = this._modelSetting.getTextureCount();
-
-      for (let modelTextureNumber = 0; modelTextureNumber < textureCount; modelTextureNumber++) {
+      for (let modelTextureNumber = 0, TextureIndex = -1; modelTextureNumber < textureCount; modelTextureNumber++) {
         let modelTextureName = this._modelSetting.getTextureFileName(modelTextureNumber);
         // 如果纹理名称是空字符，请跳过加载/绑定过程
         if (modelTextureName == '') {
@@ -1218,18 +1217,17 @@ export class LAppModel extends CubismUserModel {
             continue;
           }
         }
-
+        TextureIndex += 1;
         // 将纹理加载到WebGL纹理单元中
         let texturePath = modelTextureName;
         texturePath = this._modelHomeDir + texturePath;
 
         // 加载完成后调用的回调函数
         const onLoad = (textureInfo: TextureInfo): void => {
-          this.getRenderer().bindTexture(modelTextureNumber, textureInfo.id);
-
+          this.getRenderer().bindTexture(TextureIndex, textureInfo.id);
           this._textureCount++;
 
-          if (this._textureCount >= textureCount) {
+          if (this._textureCount >= (this._modelTextures.length > 0 ? this._modelTextures.length : textureCount)) {
             // 加载完成
             this._state = LoadStep.CompleteSetup;
           }

@@ -159,7 +159,6 @@ export namespace Live2DCubismFramework {
       if (!this.isExistTextureFiles()) {
         return 0;
       }
-
       return this._jsonValue.at(FrequestNode.FrequestNode_Textures).getSize();
     }
 

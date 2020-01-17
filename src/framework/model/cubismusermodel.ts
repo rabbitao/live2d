@@ -72,6 +72,7 @@ export namespace Live2DCubismFramework {
       }
     }
     public _modelName: string;        // 模型名称
+    public _motionIdleName: string; // 默认发呆的动作名称
 
     protected _moc: CubismMoc;        // Moc数据
     protected _model: CubismModel;    // 模型实例
@@ -79,7 +80,6 @@ export namespace Live2DCubismFramework {
 
     protected _motionManager: CubismMotionManager;    // 运动管理
     protected _motionQueue: CubismMotionParam[]; // 动作队列
-    public _motionIdleName: string; // 默认发呆的动作名称
     protected _expressionManager: CubismMotionManager;    // 面部表情管理
     protected _eyeBlink: CubismEyeBlink;         // 自动闪烁
     protected _breath: CubismBreath;           // 呼吸

@@ -110,8 +110,8 @@ export namespace Live2DCubismFramework {
             }
             // resolve(motionQueueEntry._motionQueueEntryHandle, model);
             if (LAppDefine.DebugMode) {
-              LAppPal.printLog('[APP]resolve motion {0}', motion._name)
-              LAppPal.printLog('----------------------------------')
+              LAppPal.printLog('[APP]resolve motion {0}', motion._name);
+              LAppPal.printLog('----------------------------------');
             }
             resolve(model);
           } else {
@@ -188,7 +188,7 @@ export namespace Live2DCubismFramework {
     public isFinishedByMotionName(motionName: string) {
       if (motionName) {
         let motionArray = this._motions.get();
-        let find = motionArray.find((item) => { return item._motion._name === motionName; });
+        let find = motionArray.find((item) => item._motion._name === motionName);
         if (!find) {
           return true;
         } else {
@@ -206,7 +206,7 @@ export namespace Live2DCubismFramework {
      */
     public stopAllMotions(): Promise<void> {
       // ------- 它执行的过程 -------
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         // 如果已经有动作，则提高结束标志
         for (let ite: iterator<CubismMotionQueueEntry> = this._motions.begin(); ite.notEqual(this._motions.end());) {
           let motionQueueEntry: CubismMotionQueueEntry = ite.ptr();
@@ -221,8 +221,8 @@ export namespace Live2DCubismFramework {
           motionQueueEntry = null as any;
           ite = this._motions.erase(ite); // 删除
         }
-        resolve()
-      })
+        resolve();
+      });
     }
 
     /**

@@ -188,7 +188,7 @@ export class LAppLive2DManager {
     if (this._viewMatrix != null) {
       projection.multiplyByMatrix(this._viewMatrix);
     }
-    
+
     const saveProjection: Csm_CubismMatrix44 = projection.clone();
     const modelCount: number = this._models.getSize();
 
@@ -219,7 +219,7 @@ export class LAppLive2DManager {
       let newModel = new LAppModel(resource, this.delegate);
       this._models.pushBack(newModel);
       newModel._batchLoad = (typeof (batchLoad) === 'boolean') ? batchLoad : false;
-      newModel.loadAssets(resource.path, modelFileName, resource.fileName, resource.textures).then(() => {
+      newModel.loadAssets(resource.path, modelFileName, resource.modelName, resource.textures).then(() => {
         resolve(newModel);
       }).catch(() => {
         resolve(null);
