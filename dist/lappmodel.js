@@ -603,6 +603,7 @@ var LAppModel = /** @class */ (function (_super) {
         }
         if (param && param.zIndex) {
             canvas.style.zIndex = param.zIndex.toString();
+            canvas.parentElement.style.zIndex = param.zIndex.toString();
         }
         this._modelClear = false;
     };

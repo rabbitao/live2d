@@ -93,6 +93,7 @@ export class LAppDelegate {
       wrap.style.height = '100%';
       wrap.style.top = '0px';
       wrap.style.left = '0px';
+      wrap.style.zIndex = '100'
       document.body.appendChild(wrap);
     }
     canvas = document.getElementById(canvasId) as HTMLCanvasElement;
