@@ -11,7 +11,7 @@ var Csm_CubismMatrix44 = cubismmatrix44.CubismMatrix44;
 import { LAppModel } from './lappmodel';
 import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
-import { canvas } from './lappdelegate';
+import { LAppDelegate } from './lappdelegate';
 export var s_instance = null;
 /**
  * 在示例应用程序中管理CubismModel的类
@@ -25,6 +25,7 @@ var LAppLive2DManager = /** @class */ (function () {
         this._viewMatrix = new Csm_CubismMatrix44();
         this._models = new Csm_csmVector();
         this._userModels = [];
+        this.delegate = LAppDelegate.getInstance();
     }
     /**
      * 返回类的实例（单例）。
@@ -46,6 +47,13 @@ var LAppLive2DManager = /** @class */ (function () {
             s_instance = void 0;
         }
         s_instance = null;
+    };
+    LAppLive2DManager.prototype.initDelegate = function (renderConfig) {
+        if (this.delegate.initialize() == false) {
+            return false;
+        }
+        this.delegate.startRender(renderConfig);
+        return true;
     };
     /**
      * 返回当前场景中保存的模型。
@@ -158,10 +166,6 @@ var LAppLive2DManager = /** @class */ (function () {
      */
     LAppLive2DManager.prototype.onUpdate = function () {
         var projection = new Csm_CubismMatrix44();
-        var width, height;
-        width = canvas.width;
-        height = canvas.height;
-        projection.scale(1.0, width / height);
         if (this._viewMatrix != null) {
             projection.multiplyByMatrix(this._viewMatrix);
         }
@@ -190,10 +194,10 @@ var LAppLive2DManager = /** @class */ (function () {
             if (mdl) {
                 resolve(mdl);
             }
-            var newModel = new LAppModel(resource);
+            var newModel = new LAppModel(resource, _this.delegate);
             _this._models.pushBack(newModel);
             newModel._batchLoad = (typeof (batchLoad) === 'boolean') ? batchLoad : false;
-            newModel.loadAssets(resource.path, modelFileName, resource.fileName).then(function () {
+            newModel.loadAssets(resource.path, modelFileName, resource.modelName, resource.textures).then(function () {
                 resolve(newModel);
             }).catch(function () {
                 resolve(null);

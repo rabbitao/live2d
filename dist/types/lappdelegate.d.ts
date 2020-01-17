@@ -28,6 +28,8 @@ export declare class LAppDelegate {
     _mouseY: number;
     _isEnd: boolean;
     _textureManager: LAppTextureManager;
+    _renderThreadId: number;
+    _renderStatus: boolean;
     /**
      * 构造函数
      */
@@ -35,11 +37,7 @@ export declare class LAppDelegate {
     /**
      * 初始化您需要的APP。
      */
-    initialize(config: {
-        canvasId: string;
-        width: number;
-        height: number;
-    }): boolean;
+    initialize(): boolean;
     /**
      * 释放。
      */
@@ -47,7 +45,11 @@ export declare class LAppDelegate {
     /**
      * 执行过程。
      */
-    run(): void;
+    startRender(param?: {
+        efficient: boolean;
+        fps?: number;
+    }): void;
+    stopRender(): void;
     /**
      * 注册着色器。
      */

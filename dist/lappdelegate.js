@@ -30,6 +30,8 @@ var LAppDelegate = /** @class */ (function () {
         this._mouseX = 0.0;
         this._mouseY = 0.0;
         this._isEnd = false;
+        this._renderThreadId = 0;
+        this._renderStatus = false;
         this._cubismOption = new Csm_Option();
         this._view = new LAppView();
         this._textureManager = new LAppTextureManager();
@@ -58,33 +60,33 @@ var LAppDelegate = /** @class */ (function () {
     /**
      * 初始化您需要的APP。
      */
-    LAppDelegate.prototype.initialize = function (config) {
+    LAppDelegate.prototype.initialize = function () {
         var _this = this;
-        config.canvasId = config.canvasId || 'live2d-core-canvas';
-        config.width = config.width || 1000;
-        config.height = config.height || 800;
+        var canvasId = 'live2d-core-canvas';
+        var width = window.innerWidth;
+        var height = window.innerHeight;
         // 创建html元素
         var wrap = document.getElementById('live2d-core-wrap');
         if (!wrap) {
             wrap = document.createElement('div');
             wrap.id = 'live2d-core-wrap';
-            wrap.style.position = 'absolute';
+            wrap.style.position = 'fixed';
             wrap.style.width = '100%';
             wrap.style.height = '100%';
             wrap.style.top = '0px';
             wrap.style.left = '0px';
             document.body.appendChild(wrap);
         }
-        canvas = document.getElementById(config.canvasId);
+        canvas = document.getElementById(canvasId);
         if (!canvas) {
             canvas = document.createElement('canvas');
-            canvas.id = config.canvasId;
-            canvas.style.position = 'absolute';
+            canvas.id = canvasId;
+            canvas.style.position = 'fixed';
             canvas.style.left = '0px';
             canvas.style.top = '0px';
             canvas.style.zIndex = '100';
-            canvas.setAttribute('width', config.width.toString());
-            canvas.setAttribute('height', config.height.toString());
+            canvas.setAttribute('width', width.toString());
+            canvas.setAttribute('height', height.toString());
             document.getElementById('live2d-core-wrap').appendChild(canvas);
         }
         // 初始化gl上下文
@@ -227,10 +229,14 @@ var LAppDelegate = /** @class */ (function () {
     /**
      * 执行过程。
      */
-    LAppDelegate.prototype.run = function () {
+    LAppDelegate.prototype.startRender = function (param) {
         var _this = this;
+        if (this._renderStatus) {
+            return;
+        }
         // 主循环
         var loop = function () {
+            _this._renderStatus = true;
             // 检查实例
             if (s_instance == null) {
                 return;
@@ -252,9 +258,29 @@ var LAppDelegate = /** @class */ (function () {
             // 绘图更新
             _this._view.render();
             // 递归调用循环
-            requestAnimationFrame(loop);
+            if (Object.prototype.toString.call(param) === '[object Object]' && param) {
+                if (param.efficient) {
+                    _this._renderThreadId = requestAnimationFrame(loop);
+                }
+                else {
+                    var fps = param.fps ? param.fps : 60;
+                    _this._renderThreadId = window.setTimeout(function () {
+                        loop();
+                    }, 1000 / fps);
+                }
+            }
+            else {
+                _this._renderThreadId = requestAnimationFrame(loop);
+            }
         };
         loop();
+    };
+    LAppDelegate.prototype.stopRender = function () {
+        if (!this._renderStatus) {
+            return;
+        }
+        window.cancelAnimationFrame(this._renderThreadId);
+        this._renderStatus = false;
     };
     /**
      * 注册着色器。

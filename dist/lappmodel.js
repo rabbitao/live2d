@@ -43,7 +43,7 @@ var CubismModelSettingJson = cubismmodelsettingjson.CubismModelSettingJson;
 var CubismDefaultParameterId = cubismdefaultparameterid;
 import { LAppDefine } from './lappdefine';
 import { LAppPal } from './lapppal';
-import { gl, canvas, frameBuffer, LAppDelegate } from './lappdelegate';
+import { gl, canvas, frameBuffer } from './lappdelegate';
 function createBuffer(path, callBack) {
     LAppPal.loadFileAsBytes(path, callBack);
 }
@@ -86,8 +86,9 @@ var LAppModel = /** @class */ (function (_super) {
     /**
      * 构造函数
      */
-    function LAppModel(resource) {
+    function LAppModel(resource, delegate) {
         var _this = _super.call(this) || this;
+        _this._delegate = delegate;
         _this._modelResource = resource;
         _this._modelSetting = null;
         _this._modelHomeDir = null;
@@ -117,6 +118,9 @@ var LAppModel = /** @class */ (function (_super) {
         _this._modelTextures = [];
         _this._autoIdle = true;
         _this._batchLoad = false;
+        _this._modelPositionX = canvas.width / 2;
+        _this._modelPositionY = canvas.height / 2;
+        _this._modelSize = resource.modelSize;
         return _this;
     }
     /**
@@ -295,6 +299,7 @@ var LAppModel = /** @class */ (function (_super) {
         var motion = this._motions.getValue(name);
         var autoDelete = false;
         if (motion == null) {
+            console.log('motion null');
             var path_1 = fileName;
             path_1 = this._modelHomeDir + path_1;
             return this.fetchFile(path_1, 'arraybuffer').then(function (response) {
@@ -588,11 +593,13 @@ var LAppModel = /** @class */ (function (_super) {
      * @Param {pointX: number, pointY: number} 出现的坐标
      */
     LAppModel.prototype.appear = function (param) {
-        if (param && param.pointY) {
-            canvas.style.top = param.pointY + 'px';
-        }
-        if (param && param.pointX) {
-            canvas.style.left = param.pointX + 'px';
+        if (typeof (param) === 'object') {
+            if (typeof (param.pointX) === 'number') {
+                this._modelPositionX = param.pointX;
+            }
+            if (typeof (param.pointY) === 'number') {
+                this._modelPositionY = param.pointY;
+            }
         }
         if (param && param.zIndex) {
             canvas.style.zIndex = param.zIndex.toString();
@@ -616,7 +623,7 @@ var LAppModel = /** @class */ (function (_super) {
             visible: !this._modelClear,
             autoIdle: this._autoIdle,
             mouthOpen: this._mouthOpen,
-            idleMotion: this._motionIdleName
+            idleMotion: this._motionIdleName,
         };
     };
     /**
@@ -663,11 +670,69 @@ var LAppModel = /** @class */ (function (_super) {
         if (this._model == null) {
             return;
         }
+        var width = canvas.width;
+        var height = canvas.height;
+        if (typeof (this._modelSize) === 'number') {
+            matrix.scale(this._modelSize / width, this._modelSize / height);
+        }
+        else {
+            matrix.scale(1, width / height);
+        }
+        matrix.translate(this._delegate.getView().transformScreenX(this._modelPositionX), this._delegate.getView().transformScreenY(this._modelPositionY));
         // 每次阅读后
         if (this._state == LoadStep.CompleteSetup) {
             matrix.multiplyByMatrix(this._modelMatrix);
             this.getRenderer().setMvpMatrix(matrix);
             this.doDraw();
+        }
+    };
+    /**
+     * asyncLoadMotionGroup
+     */
+    LAppModel.prototype.asyncLoadMotionGroup = function (motionGroups) {
+        var _this = this;
+        this._model.saveParameters();
+        var _loop_2 = function (group) {
+            this_2._allMotionCount += this_2._modelSetting.getMotionCount(group);
+            var _loop_3 = function (i) {
+                var name_3 = CubismString.getFormatedString('{0}_{1}', group, i);
+                var path = this_2._modelSetting.getMotionFileName(group, i);
+                path = this_2._modelHomeDir + path;
+                if (LAppDefine.DebugMode) {
+                    LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
+                }
+                this_2.fetchFile(path, 'arraybuffer').then(function (response) {
+                    return response.arrayBuffer();
+                }).then(function (arrayBuffer) {
+                    var buffer = arrayBuffer;
+                    var size = buffer.byteLength;
+                    var priority = name_3.split('_')[0] === _this._motionIdleName ? LAppDefine.PriorityIdle : LAppDefine.PriorityNormal;
+                    var tmpMotion = _this.loadMotion(buffer, size, name_3, priority);
+                    var fadeTime = _this._modelSetting.getMotionFadeInTimeValue(group, i);
+                    if (fadeTime >= 0.0) {
+                        tmpMotion.setFadeInTime(fadeTime);
+                    }
+                    fadeTime = _this._modelSetting.getMotionFadeOutTimeValue(group, i);
+                    if (fadeTime >= 0.0) {
+                        tmpMotion.setFadeOutTime(fadeTime);
+                    }
+                    tmpMotion.setEffectIds(_this._eyeBlinkIds, _this._lipSyncIds);
+                    if (_this._motions.getValue(name_3) != null) {
+                        ACubismMotion.delete(_this._motions.getValue(name_3));
+                    }
+                    _this._motions.setValue(name_3, tmpMotion);
+                    deleteBuffer(buffer, path);
+                    _this._motionCount++;
+                });
+            };
+            for (var i = 0; i < this_2._modelSetting.getMotionCount(group); i++) {
+                _loop_3(i);
+            }
+        };
+        var this_2 = this;
+        for (var _i = 0, motionGroups_1 = motionGroups; _i < motionGroups_1.length; _i++) {
+            var group = motionGroups_1[_i];
+            _loop_2(group);
         }
     };
     LAppModel.prototype.fetchFile = function (path, type) {
@@ -749,8 +814,8 @@ var LAppModel = /** @class */ (function (_super) {
             var loadCubismExpression = function () {
                 if (_this._modelSetting.getExpressionCount() > 0) {
                     var count_1 = _this._modelSetting.getExpressionCount();
-                    var _loop_2 = function (i) {
-                        var name_3 = _this._modelSetting.getExpressionName(i);
+                    var _loop_4 = function (i) {
+                        var name_4 = _this._modelSetting.getExpressionName(i);
                         var path = _this._modelSetting.getExpressionFileName(i);
                         path = _this._modelHomeDir + path;
                         _this.fetchFile(path, 'arraybuffer').then(function (response) {
@@ -758,12 +823,12 @@ var LAppModel = /** @class */ (function (_super) {
                         }).then(function (arrayBuffer) {
                             var buffer = arrayBuffer;
                             var size = buffer.byteLength;
-                            var motion = _this.loadExpression(buffer, size, name_3);
-                            if (_this._expressions.getValue(name_3) != null) {
-                                ACubismMotion.delete(_this._expressions.getValue(name_3));
-                                _this._expressions.setValue(name_3, null);
+                            var motion = _this.loadExpression(buffer, size, name_4);
+                            if (_this._expressions.getValue(name_4) != null) {
+                                ACubismMotion.delete(_this._expressions.getValue(name_4));
+                                _this._expressions.setValue(name_4, null);
                             }
-                            _this._expressions.setValue(name_3, motion);
+                            _this._expressions.setValue(name_4, motion);
                             deleteBuffer(buffer, path);
                             _this._expressionCount++;
                             if (_this._expressionCount >= count_1) {
@@ -774,7 +839,7 @@ var LAppModel = /** @class */ (function (_super) {
                         });
                     };
                     for (var i = 0; i < count_1; i++) {
-                        _loop_2(i);
+                        _loop_4(i);
                     }
                     _this._state = LoadStep.WaitLoadExpression;
                 }
@@ -943,55 +1008,6 @@ var LAppModel = /** @class */ (function (_super) {
         });
     };
     /**
-     * asyncLoadMotionGroup
-     */
-    LAppModel.prototype.asyncLoadMotionGroup = function (motionGroups) {
-        var _this = this;
-        this._model.saveParameters();
-        var _loop_3 = function (group) {
-            this_2._allMotionCount += this_2._modelSetting.getMotionCount(group);
-            var _loop_4 = function (i) {
-                var name_4 = CubismString.getFormatedString('{0}_{1}', group, i);
-                var path = this_2._modelSetting.getMotionFileName(group, i);
-                path = this_2._modelHomeDir + path;
-                if (LAppDefine.DebugMode) {
-                    LAppPal.printLog('[APP]load motion: {0} => [{1}_{2}]', path, group, i);
-                }
-                this_2.fetchFile(path, 'arraybuffer').then(function (response) {
-                    return response.arrayBuffer();
-                }).then(function (arrayBuffer) {
-                    var buffer = arrayBuffer;
-                    var size = buffer.byteLength;
-                    var priority = name_4.split('_')[0] === _this._motionIdleName ? LAppDefine.PriorityIdle : LAppDefine.PriorityNormal;
-                    var tmpMotion = _this.loadMotion(buffer, size, name_4, priority);
-                    var fadeTime = _this._modelSetting.getMotionFadeInTimeValue(group, i);
-                    if (fadeTime >= 0.0) {
-                        tmpMotion.setFadeInTime(fadeTime);
-                    }
-                    fadeTime = _this._modelSetting.getMotionFadeOutTimeValue(group, i);
-                    if (fadeTime >= 0.0) {
-                        tmpMotion.setFadeOutTime(fadeTime);
-                    }
-                    tmpMotion.setEffectIds(_this._eyeBlinkIds, _this._lipSyncIds);
-                    if (_this._motions.getValue(name_4) != null) {
-                        ACubismMotion.delete(_this._motions.getValue(name_4));
-                    }
-                    _this._motions.setValue(name_4, tmpMotion);
-                    deleteBuffer(buffer, path);
-                    _this._motionCount++;
-                });
-            };
-            for (var i = 0; i < this_2._modelSetting.getMotionCount(group); i++) {
-                _loop_4(i);
-            }
-        };
-        var this_2 = this;
-        for (var _i = 0, motionGroups_1 = motionGroups; _i < motionGroups_1.length; _i++) {
-            var group = motionGroups_1[_i];
-            _loop_3(group);
-        }
-    };
-    /**
      * 将纹理加载到纹理单元中
      */
     LAppModel.prototype.setupTextures = function () {
@@ -1001,38 +1017,41 @@ var LAppModel = /** @class */ (function (_super) {
         if (this._state == LoadStep.LoadTexture) {
             // 用于纹理阅读
             var textureCount_1 = this._modelSetting.getTextureCount();
-            var _loop_5 = function (modelTextureNumber) {
+            var _loop_5 = function (modelTextureNumber, TextureIndex) {
                 var modelTextureName = this_3._modelSetting.getTextureFileName(modelTextureNumber);
                 // 如果纹理名称是空字符，请跳过加载/绑定过程
                 if (modelTextureName == '') {
                     LAppPal.printLog('[APP]getTextureFileName null');
-                    return "continue";
+                    return out_TextureIndex_1 = TextureIndex, "continue";
                 }
                 // 如果用户指定了纹理名称 则只加载用户指定的纹理
                 if (this_3._modelTextures.length > 0) {
                     if (!this_3._modelTextures.includes(modelTextureName)) {
-                        return "continue";
+                        return out_TextureIndex_1 = TextureIndex, "continue";
                     }
                 }
+                TextureIndex += 1;
                 // 将纹理加载到WebGL纹理单元中
                 var texturePath = modelTextureName;
                 texturePath = this_3._modelHomeDir + texturePath;
                 // 加载完成后调用的回调函数
                 var onLoad = function (textureInfo) {
-                    _this.getRenderer().bindTexture(modelTextureNumber, textureInfo.id);
+                    _this.getRenderer().bindTexture(TextureIndex, textureInfo.id);
                     _this._textureCount++;
-                    if (_this._textureCount >= textureCount_1) {
+                    if (_this._textureCount >= (_this._modelTextures.length > 0 ? _this._modelTextures.length : textureCount_1)) {
                         // 加载完成
                         _this._state = LoadStep.CompleteSetup;
                     }
                 };
                 // 阅读
-                LAppDelegate.getInstance().getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
+                this_3._delegate.getTextureManager().createTextureFromPngFile(texturePath, usePremultiply, onLoad);
                 this_3.getRenderer().setIsPremultipliedAlpha(usePremultiply);
+                out_TextureIndex_1 = TextureIndex;
             };
-            var this_3 = this;
-            for (var modelTextureNumber = 0; modelTextureNumber < textureCount_1; modelTextureNumber++) {
-                _loop_5(modelTextureNumber);
+            var this_3 = this, out_TextureIndex_1;
+            for (var modelTextureNumber = 0, TextureIndex = -1; modelTextureNumber < textureCount_1; modelTextureNumber++) {
+                _loop_5(modelTextureNumber, TextureIndex);
+                TextureIndex = out_TextureIndex_1;
             }
             this._state = LoadStep.WaitLoadTexture;
         }

@@ -18,11 +18,13 @@ import CubismIdHandle = cubismid.CubismIdHandle;
 import CubismUserModel = cubismusermodel.CubismUserModel;
 import ICubismModelSetting = icubismmodelsetting.ICubismModelSetting;
 import CubismMotionParam = userMotionParam.CubismMotionParam;
+import { LAppDelegate } from './lappdelegate';
 /**
  * 用户实际使用的模型的实现类<br>
  * 调用模型生成，功能组件生成，更新处理和呈现。
  */
 export declare class LAppModel extends CubismUserModel {
+    _delegate: LAppDelegate;
     _modelSetting: ICubismModelSetting;
     _modelHomeDir: string;
     _modelTextures: string[];
@@ -51,17 +53,21 @@ export declare class LAppModel extends CubismUserModel {
     _mouthOpen: boolean;
     _mouthSpeed: number;
     _mouthSpeedCal: number;
-    _mouthParamY: Array<number>;
+    _mouthParamY: number[];
     _mouthOpenIndex: number;
     _autoIdle: boolean;
     _batchLoad: boolean;
+    _modelPositionX: number;
+    _modelPositionY: number;
+    _modelSize: number;
     /**
      * 构造函数
      */
     constructor(resource: {
         path: string;
         modelName: string;
-    });
+        modelSize: number;
+    }, delegate: LAppDelegate);
     /**
      * model3.json从目录和文件路径生成模型
      * @param dir
@@ -191,6 +197,10 @@ export declare class LAppModel extends CubismUserModel {
      * 绘制模型的过程。 通过空间的View-Projection矩阵绘制模型。
      */
     draw(matrix: CubismMatrix44): void;
+    /**
+     * asyncLoadMotionGroup
+     */
+    asyncLoadMotionGroup(motionGroups: string[]): void;
     private fetchFile;
     /**
      * 执行一组动作。
@@ -203,10 +213,6 @@ export declare class LAppModel extends CubismUserModel {
      * @param setting ICubismModelSetting的一个实例
      */
     private setupModel;
-    /**
-     * asyncLoadMotionGroup
-     */
-    asyncLoadMotionGroup(motionGroups: Array<string>): void;
     /**
      * 将纹理加载到纹理单元中
      */

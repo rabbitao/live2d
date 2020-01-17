@@ -3,6 +3,7 @@ import { Live2DCubismFramework as csmvector } from './framework/type/csmvector';
 import Csm_csmVector = csmvector.csmVector;
 import Csm_CubismMatrix44 = cubismmatrix44.CubismMatrix44;
 import { LAppModel } from './lappmodel';
+import { LAppDelegate } from './lappdelegate';
 export declare let s_instance: LAppLive2DManager;
 /**
  * 在示例应用程序中管理CubismModel的类
@@ -23,10 +24,15 @@ export declare class LAppLive2DManager {
     _viewMatrix: Csm_CubismMatrix44;
     _models: Csm_csmVector<LAppModel>;
     _userModels: LAppModel[];
+    delegate: LAppDelegate;
     /**
      * 构造函数
      */
     constructor();
+    initDelegate(renderConfig?: {
+        efficient: boolean;
+        fps?: number;
+    }): boolean;
     /**
      * 返回当前场景中保存的模型。
      *
@@ -69,6 +75,8 @@ export declare class LAppLive2DManager {
         path: string;
         fileName: string;
         modelName: string;
+        modelSize: number;
+        textures: string[];
     }, batchLoad?: boolean): Promise<LAppModel | null>;
     setDebugMode(mode: boolean): void;
 }

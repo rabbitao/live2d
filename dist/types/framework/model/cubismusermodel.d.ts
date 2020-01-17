@@ -49,12 +49,12 @@ export declare namespace Live2DCubismFramework {
          */
         static cubismDefaultMotionEventCallback(caller: CubismMotionQueueManager, eventValue: csmString, customData: CubismUserModel): void;
         _modelName: string;
+        _motionIdleName: string;
         protected _moc: CubismMoc;
         protected _model: CubismModel;
         protected _modelClear: boolean;
         protected _motionManager: CubismMotionManager;
         protected _motionQueue: CubismMotionParam[];
-        _motionIdleName: string;
         protected _expressionManager: CubismMotionManager;
         protected _eyeBlink: CubismEyeBlink;
         protected _breath: CubismBreath;
